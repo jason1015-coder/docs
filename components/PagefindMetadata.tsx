@@ -13,7 +13,7 @@ export function PagefindMetadata({
 }: Props) {
   // If not latest version, exclude from search entirely
   if (!isLatestVersion) {
-    return <div data-pagefind-ignore="page" hidden />;
+    return <div data-pagefind-ignore="all" hidden />;
   }
 
   return (
