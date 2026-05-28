@@ -74,4 +74,4 @@ This is informational, not promotional, and matches the brand voice — operatio
 
 ## When in doubt
 
-The fastest way to clarify a step is on [Discord](https://discord.gg/ktPDV6rekE). For changes to this playbook itself, open an issue or a PR on the [docs repository](https://github.com/Nano-Collective/docs).
+The fastest way to clarify a step is on [Discord](https://discord.gg/ktPDV6rekE), or email [hello@nanocollective.org](mailto:hello@nanocollective.org). For changes to this playbook itself, open an issue or a PR on the [docs repository](https://github.com/Nano-Collective/docs).

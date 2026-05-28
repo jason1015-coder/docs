@@ -64,4 +64,4 @@ The Nano Collective is built by volunteers and offered freely. If the work has b
 
 Be respectful and inclusive. Focus on constructive feedback. Help create a welcoming environment for every contributor, regardless of experience. Remember that everyone here is learning and contributing voluntarily.
 
-If something goes wrong — you experience or witness behaviour that falls short of this — reach out to a maintainer on Discord or by email. We take this seriously.
+If something goes wrong — you experience or witness behaviour that falls short of this — reach out to a maintainer on [Discord](https://discord.gg/ktPDV6rekE) or email [hello@nanocollective.org](mailto:hello@nanocollective.org). We take this seriously.

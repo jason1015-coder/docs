@@ -1,0 +1,62 @@
+name: Archive Whitepapers
+
+# Once a day, apply the archive timeline rules to terminal-status
+# whitepapers and rebuild the archive index. Any change is committed back
+# to main. The whitepapers manifest is also regenerated so the website
+# picks up archive state on its next build.
+#
+# Rules and script: scripts/archive-whitepapers.ts
+
+on:
+    schedule:
+        # Daily at 04:15 UTC. Off-peak; close enough to "yesterday's
+        # status_changed_on dates have ticked over" without colliding with
+        # the deploy workflow that runs at 00:15 UTC.
+        - cron: "15 4 * * *"
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+concurrency:
+    group: archive-whitepapers-${{ github.ref }}
+    cancel-in-progress: false
+
+jobs:
+    archive:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Set up PNPM
+              uses: pnpm/action-setup@v4
+              with:
+                  version: null
+
+            - name: Use Node.js 22
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: "pnpm"
+
+            - name: Install dependencies
+              run: pnpm install --no-frozen-lockfile
+
+            - name: Apply archive rules
+              run: pnpm run whitepapers:archive
+
+            - name: Regenerate manifest
+              run: pnpm run whitepapers:manifest
+
+            - name: Commit changes if any
+              run: |
+                  if git diff --quiet; then
+                    echo "Nothing to archive. No changes."
+                    exit 0
+                  fi
+                  git config user.name "nc-bot"
+                  git config user.email "hello@nanocollective.org"
+                  git add content/collective/whitepapers public/whitepapers.json
+                  git commit -m "chore: apply daily whitepaper archive [skip ci]"
+                  git push

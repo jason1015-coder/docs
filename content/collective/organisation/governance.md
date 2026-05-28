@@ -21,6 +21,7 @@ What this means in practice:
 - **Project direction** — roadmaps, scope, architectural direction — currently sits with the core team, in conversation with the maintainers and active contributors of each project.
 - **Day-to-day decisions** — accepting PRs, triaging issues, releasing — sit with each project's maintainers.
 - **Collective-level decisions** — the Brand Guidelines, the Economics Charter, the Support model, governance itself — sit with the core team and are versioned publicly so that every change is dated and explained.
+- **New project approval** — at the end of a whitepaper's public review window (see [How a Project Comes to Life](/collective/projects/how-a-project-comes-to-life)), the core team makes the build / decline / iterate call. The decision is recorded on the whitepaper page itself, with rationale, including for a yes. As the collective grows, this approval call widens in the same way the rest of decision-making does.
 
 This is a centralised model. It is not a permanent one — the *Where this is going* section below sets out the direction.
 
@@ -84,4 +85,4 @@ This page is versioned in the docs repository. Material changes — anything tha
 
 Smaller changes (clarifications, typo fixes, sharpening of wording) are committed directly with a clear commit message.
 
-If anything here is unclear, contradicts another part of the docs, or no longer reflects how the collective actually operates, open an issue on the [docs repository](https://github.com/Nano-Collective/docs).
+If anything here is unclear, contradicts another part of the docs, or no longer reflects how the collective actually operates, open an issue on the [docs repository](https://github.com/Nano-Collective/docs) or email [hello@nanocollective.org](mailto:hello@nanocollective.org).

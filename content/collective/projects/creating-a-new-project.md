@@ -1,7 +1,7 @@
 ---
 title: "Creating a New Project"
 description: "Conventions and playbook for spinning up a new project under the Nano Collective"
-sidebar_order: 1
+sidebar_order: 3
 ---
 
 # Creating a New Project
@@ -11,6 +11,12 @@ Projects under the Nano Collective run independently — each has its own mainta
 This guide captures those conventions. It is the playbook for spinning up a new repository under the collective. The furthest-ahead reference implementation is [Nanocoder](https://github.com/Nano-Collective/nanocoder); when in doubt, mirror what that project does.
 
 The goal is not bureaucracy. It is to make every project in the collective legible from the outside, lower the barrier for contributors moving between projects, and ensure every tool we ship meets a shared bar for quality and openness.
+
+## Before this playbook
+
+This page is for projects that have already been approved to build. For non-trivial new projects, the path to approval starts at [How a Project Comes to Life](/collective/projects/how-a-project-comes-to-life): a whitepaper, a public review window, and a Stage 3 build decision. The conventions below kick in once that decision is a yes.
+
+Small utilities, focused libraries, and well-scoped tools can skip the whitepaper and go straight to this playbook. If you are not sure which path applies, raise it in [Discord](https://discord.gg/ktPDV6rekE) first.
 
 ## Before You Start
 

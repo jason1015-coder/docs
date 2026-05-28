@@ -22,6 +22,12 @@ export default function Footer() {
           >
             Main Website
           </Link>
+          <a
+            href="mailto:hello@nanocollective.org"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Contact
+          </a>
         </nav>
         <div className="flex gap-4">
           <a

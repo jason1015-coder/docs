@@ -53,6 +53,28 @@ When a piece of work is a bounty candidate, coordination is currently manual and
 
 If you want to discuss whether a piece of work could be a bounty, talk to a maintainer first — early conversations are encouraged and reduce the chance of mismatched expectations.
 
+### Other forms of support beyond the community fund
+
+The community fund (bounty pool) is one channel. As the collective scales its sponsor and partnership programmes, other channels join it:
+
+- **Designated donations.** A donor scopes and funds a specific piece of work with the core team. The work is delivered openly and reported publicly. This is documented in detail on the [sponsor page](https://nanocollective.org/sponsor#one-off-contributions).
+- **Sponsor-provided resources.** As sponsorships and partnerships come online, the resources they provide — free or discounted credits for compute, model APIs, hosting, and similar — become available to NC projects, and where applicable to individual contributors working on substantial NC work.
+- **Bespoke partnerships.** Larger arrangements designed case by case. Terms are agreed and published before the relationship begins.
+
+**Eligibility extends beyond new-project proposers.** A contributor taking on a substantial piece of work on an existing NC project can be eligible for support too. The criteria are the same as for bounties: the work must be in scope, the scope must be agreed before any money or resources change hands, and nothing is retrospective.
+
+The full, current catalogue of what is available and how to ask is maintained at [Contributor Resources](/collective/organisation/contributor-resources). That page is the place to start if you are wondering what you can ask for.
+
+### How to ask for support
+
+Three routes, by what you are asking about:
+
+1. **Proposing a new project** — open a Stage 0 conversation. See [How a Project Comes to Life](/collective/projects/how-a-project-comes-to-life).
+2. **Substantial work on an existing project** — message a maintainer or the core team on [Discord](https://discord.gg/ktPDV6rekE), or reach out by email.
+3. **Anything else, or non-public first** — email [hello@nanocollective.org](mailto:hello@nanocollective.org).
+
+The core team will be straightforward about what is and is not available today. The bias is towards saying yes to scoped, well-defined asks that align with what NC is building, subject to actual capacity.
+
 ## Where the fund is today
 
 Honest version: the community fund is a mechanism, not yet a balance. The structure exists — fiscal hosting via Open Source Collective, public ledger, ring-fenced share of incoming funds — but there is effectively nothing in it to spend yet.
@@ -117,7 +139,7 @@ If you have contributed under a previous version of this charter, the terms that
 
 ## Questions and contact
 
-Open an issue on the [docs repository](https://github.com/Nano-Collective/docs), or contact the Nano Collective core team directly.
+Open an issue on the [docs repository](https://github.com/Nano-Collective/docs), or email the Nano Collective core team at [hello@nanocollective.org](mailto:hello@nanocollective.org).
 
 Financial activity: [opencollective.com/nano-collective](https://opencollective.com/nano-collective)
 

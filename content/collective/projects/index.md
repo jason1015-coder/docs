@@ -19,7 +19,9 @@ Each project has its own dedicated documentation. The pages in this section cove
 
 ## In this section
 
-- **[Creating a New Project](/collective/projects/creating-a-new-project)** — The playbook for spinning up a new project under the collective. Covers repo structure, licensing, CI, testing, documentation, and release.
-- **[Stack Suggestions](/collective/projects/stack-suggestions)** — Recommended tooling and conventions per language stack — the *how* that complements the *what* in the Creating a New Project guide.
+- **[How a Project Comes to Life](/collective/projects/how-a-project-comes-to-life)** — The path from "I have an idea" to "the project ships under the Nano Collective". Stages, gates, status taxonomy, what you sign up for, what you get.
+- **[Contributing](/collective/projects/contributing)** — How to get involved with an existing project. Where to find work, how to submit, what to expect from review.
+- **[Creating a New Project](/collective/projects/creating-a-new-project)** — The conventions playbook that kicks in once a project is approved to build. Covers repo structure, licensing, CI, testing, documentation, and release.
+- **[Stack Suggestions](/collective/projects/stack-suggestions)** — Recommended tooling and conventions per language stack. The *how* that complements the *what* in the Creating a New Project guide.
 
-If you are starting something new under the Nano Collective, the Creating a New Project guide is the place to begin.
+If you are starting something new under the Nano Collective, the How a Project Comes to Life page is the place to begin. If you want to contribute to an existing project, the Contributing guide is.

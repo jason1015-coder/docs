@@ -21,6 +21,7 @@ A founding core team currently stewards the collective day to day. Our explicit 
 - **[Support the Collective](/collective/organisation/support)** — How individuals and organisations can support NC through donations, sponsorship, or other means.
 - **[Brand Guidelines](/collective/organisation/brand)** — How the Nano Collective is talked about, written about, and presented across projects. The source of truth for tagline, voice, terms to avoid, naming, and required documentation patterns.
 - **[Governance](/collective/organisation/governance)** — How decisions get made today, how contribution works in practice, how maintainership is offered, and how the model widens as the collective grows.
+- **[Contributor Resources](/collective/organisation/contributor-resources)** — What the collective offers to contributors and project proposers today, and what is being built toward. The contributor-facing companion to the sponsor page.
 
 ## Principles we hold ourselves to
 
