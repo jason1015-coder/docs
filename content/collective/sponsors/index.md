@@ -8,6 +8,8 @@ sidebar_order: 5
 
 This section is the operational reference for how the Nano Collective sponsorship program is run. It is the canonical home for everything a contributor or core team member needs when adding, updating, or removing a sponsor across NC surfaces.
 
+Sponsorship is not limited to cash. We are equally open to non-cash support such as cloud and API credits, compute, software licenses, hardware, and other resources that help our contributors build. In-kind support is recognised on the same basis as financial support, valued at its fair equivalent.
+
 For the public-facing pitch, tiers, and how prospective sponsors get in touch, see [nanocollective.org/sponsor](https://nanocollective.org/sponsor). For the financial model behind sponsorship — where the money goes, how it reaches contributors — see the [Economics Charter](/collective/organisation/economics-charter).
 
 ## In this section

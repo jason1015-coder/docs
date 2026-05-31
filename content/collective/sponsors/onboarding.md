@@ -12,7 +12,7 @@ For tier perks and the public pitch, see [nanocollective.org/sponsor](https://na
 
 ## When a sponsorship is confirmed
 
-Trigger: a sponsor has signed up via Open Collective (Individual, Supporter), confirmed via Discord (Builder, Bespoke), or completed a designated donation conversation.
+Trigger: a sponsor has signed up via Open Collective (Individual, Supporter), confirmed via Discord (Builder, Bespoke), agreed to provide non-cash support such as credits, compute, or other resources, or completed a designated donation conversation.
 
 ### 1. Logo and link intake
 
@@ -33,6 +33,7 @@ Store the source files in the website repo at `public/sponsors/<sponsor-slug>.sv
 - **Builder** — confirm OSC tier exists at $1,000/month. If the sponsor needs an invoice, set up the OSC invoice flow (typically required for contributions over $1,000 USD).
 - **Bespoke** — terms agreed and written down before any money moves. Publish the agreed terms on `/sponsor` once the partnership is live.
 - **Bitcoin** — share the wallet address via the agreed channel; ledger the contribution in the Open Collective expense flow.
+- **Non-cash** — no Open Collective sign-up is needed, since no money changes hands. Confirm the resources (credits, compute, licenses, hardware, or similar) have been delivered or committed, then work out directly with the sponsor what they get in return: agree a fair monthly equivalent value and map it to a tier per [Sponsorship Operations](/collective/sponsors/operations). Record the agreed value and what was provided so the contribution is visible alongside cash sponsorships.
 
 Annual prepayments receive a 10% discount — apply this at OSC tier level or via invoice as appropriate.
 

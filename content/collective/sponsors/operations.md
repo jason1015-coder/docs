@@ -33,7 +33,7 @@ Width caps on desktop. Both formats are sized to these targets; heights scale to
 
 ## Where logos appear, by tier
 
-Single rule across every surface: **more dollars = more surfaces.** Builders appear everywhere Supporters do, plus more places. Supporters appear on collective-wide surfaces only. Individuals are name-only.
+Single rule across every surface: **more support = more surfaces.** This holds whether support is cash or in-kind contributions valued at their fair equivalent (see [Non-cash sponsorship](#non-cash-sponsorship)). Builders appear everywhere Supporters do, plus more places. Supporters appear on collective-wide surfaces only. Individuals are name-only.
 
 ### Website (nanocollective.org)
 
@@ -79,6 +79,12 @@ Single rule across every surface: **more dollars = more surfaces.** Builders app
 - Individuals do not appear here.
 
 **`.github/FUNDING.yml`** — exists in every NC repo, links to Open Collective. Puts the "Sponsor" button at the top of each repo with zero ongoing maintenance.
+
+## Non-cash sponsorship
+
+Sponsorship does not have to be money. We welcome in-kind support such as cloud and API credits, compute, software licenses, hardware, and other resources that help contributors build.
+
+In-kind sponsorship is placed and recognised on the same basis as cash. Because no money changes hands, non-cash sponsors do not sign up through Open Collective. Instead the core team works out directly with the sponsor what they get in return: a fair monthly equivalent value is agreed for the contribution and mapped to the same tiers (Supporter, Builder, Bespoke). From there the sponsor is treated exactly like a cash sponsor of that tier for logo placement, surfaces, and acknowledgement. Where a contribution does not map cleanly to a productised tier, it is scoped as a Bespoke partnership.
 
 ## Adding a new sponsor
 
