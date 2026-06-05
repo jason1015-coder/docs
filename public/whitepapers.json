@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-01T12:37:16.578Z",
+  "generated_at": "2026-06-05T12:56:13.069Z",
   "count": 6,
   "whitepapers": [
     {
@@ -48,7 +48,7 @@
     },
     {
       "slug": "docs-forest",
-      "title": "DocsForest (working title)",
+      "title": "DocsForest",
       "description": "A working whitepaper for a Nanocoder driven workflow that runs weekly across the collective's repositories, checks the documentation in each repo against the actual functionality, and raises an issue on the repo when the two have drifted",
       "proposer": "Will Lamerton",
       "proposer_github": "will-lamerton",
