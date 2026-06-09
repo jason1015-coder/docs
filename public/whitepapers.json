@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-09T21:43:49.443Z",
+  "generated_at": "2026-06-09T21:44:24.156Z",
   "count": 6,
   "whitepapers": [
     {
@@ -11,12 +11,7 @@
       "status": "In public review",
       "review_opens": "2026-05-19",
       "review_closes": "2026-06-18",
-      "sidebar_order": 1,
-      "issue_counts": {
-        "open": 0,
-        "closed": 0,
-        "total": 0
-      }
+      "sidebar_order": 1
     },
     {
       "slug": "prompt-scrubber",
@@ -27,12 +22,7 @@
       "status": "In public review",
       "review_opens": "2026-05-19",
       "review_closes": "2026-06-18",
-      "sidebar_order": 2,
-      "issue_counts": {
-        "open": 0,
-        "closed": 0,
-        "total": 0
-      }
+      "sidebar_order": 2
     },
     {
       "slug": "nano-os",
@@ -43,12 +33,7 @@
       "status": "In public review",
       "review_opens": "2026-05-20",
       "review_closes": "2026-06-19",
-      "sidebar_order": 3,
-      "issue_counts": {
-        "open": 4,
-        "closed": 0,
-        "total": 4
-      }
+      "sidebar_order": 3
     },
     {
       "slug": "sentinel",
@@ -59,12 +44,7 @@
       "status": "In public review",
       "review_opens": "2026-05-22",
       "review_closes": "2026-06-21",
-      "sidebar_order": 4,
-      "issue_counts": {
-        "open": 0,
-        "closed": 0,
-        "total": 0
-      }
+      "sidebar_order": 4
     },
     {
       "slug": "docs-forest",
@@ -75,12 +55,7 @@
       "status": "In public review",
       "review_opens": "2026-05-22",
       "review_closes": "2026-06-21",
-      "sidebar_order": 5,
-      "issue_counts": {
-        "open": 0,
-        "closed": 0,
-        "total": 0
-      }
+      "sidebar_order": 5
     },
     {
       "slug": "marketplace",
@@ -91,12 +66,7 @@
       "status": "In public review",
       "review_opens": "2026-05-27",
       "review_closes": "2026-06-26",
-      "sidebar_order": 6,
-      "issue_counts": {
-        "open": 0,
-        "closed": 0,
-        "total": 0
-      }
+      "sidebar_order": 6
     }
   ]
 }
