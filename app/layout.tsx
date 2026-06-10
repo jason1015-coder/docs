@@ -47,8 +47,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/og-image.png",
-        width: 1080,
-        height: 1080,
+        width: 1200,
+        height: 750,
         alt: "Nano Collective",
       },
     ],
