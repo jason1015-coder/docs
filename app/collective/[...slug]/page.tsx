@@ -5,6 +5,7 @@ import { compileMdx } from "nextra/compile";
 import { evaluate } from "nextra/evaluate";
 import { getWhitepaperIssueCounts } from "@/lib/whitepapers";
 import { useMDXComponents } from "../../../mdx-components";
+import { Suspense } from "react";
 
 interface PageProps {
   params: Promise<{
@@ -65,15 +66,8 @@ export async function generateStaticParams() {
   return collectSlugs(CONTENT_ROOT).map((slug) => ({ slug }));
 }
 
-export default async function CollectivePage({ params }: PageProps) {
-  const { slug } = await params;
+async function CompiledCollectiveSlugContent({ slug, found }: { slug: string[]; found: { content: string; relPath: string } }) {
   const components = useMDXComponents({});
-
-  const found = getCollectiveContent(slug);
-  if (!found) {
-    notFound();
-  }
-
   const compiledSource = await compileMdx(found.content, {
     filePath: `content/collective/${found.relPath}`,
     defaultShowCopyCode: true,
@@ -88,12 +82,6 @@ export default async function CollectivePage({ params }: PageProps) {
 
   const { CollectiveWrapper } = await import("@/components/CollectiveWrapper");
 
-  // Read the build-time issue counts for this whitepaper from the
-  // manifest (populated by the daily 00:15 UTC deploy via
-  // scripts/generate-whitepapers-manifest.ts). The page is a server
-  // component, so we can read the file directly and pass the counts
-  // through the wrapper into the client widget as static initial
-  // state — no runtime fetch from the browser.
   const isWhitepaperPage = slug[0] === "whitepapers" && slug.length >= 2;
   const issueCounts = isWhitepaperPage
     ? getWhitepaperIssueCounts(slug[slug.length - 1])
@@ -109,5 +97,20 @@ export default async function CollectivePage({ params }: PageProps) {
     >
       <MDXContent />
     </CollectiveWrapper>
+  );
+}
+
+export default async function CollectivePage({ params }: PageProps) {
+  const { slug } = await params;
+
+  const found = getCollectiveContent(slug);
+  if (!found) {
+    notFound();
+  }
+
+  return (
+    <Suspense fallback={<div className="p-12 text-center opacity-50 font-mono text-sm uppercase tracking-widest">[ COMPILING_MDX... ]</div>}>
+      <CompiledCollectiveSlugContent slug={slug} found={found} />
+    </Suspense>
   );
 }
