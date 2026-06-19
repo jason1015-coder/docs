@@ -18,7 +18,7 @@ export function CollectiveDocsSection() {
           <div className="relative z-10 flex flex-col h-full">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <span className="font-mono text-xs sm:text-sm font-bold text-[#0000EE] dark:text-[#A1A1AA]">
+                <span className="hidden sm:block font-mono text-xs sm:text-sm font-bold text-[#0000EE] dark:text-[#A1A1AA]">
                   [ core ]
                 </span>
                 <h3 className="text-2xl md:text-3xl font-bold tracking-tight">Nano Collective</h3>
@@ -34,7 +34,7 @@ export function CollectiveDocsSection() {
                 href="/collective"
                 className="inline-flex h-12 items-center justify-center bg-[#0000EE] dark:bg-foreground px-8 text-sm font-semibold tracking-wide text-white dark:text-background transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground w-full sm:w-auto group/btn"
               >
-                <span className="mr-3 font-bold text-white dark:text-background transition-colors">&gt;</span> 
+                <span className="mr-3 font-bold text-white dark:text-background transition-colors">&gt;</span>
                 View Docs
               </Link>
             </div>

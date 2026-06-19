@@ -5,9 +5,19 @@ import AsciiWebsiteBackgroundGenerated from "@/components/home/AsciiWebsiteBackg
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden min-h-[70vh]">
-      {/* ASCII Video Background - full screen absolute */}
-      <div className="absolute inset-0 pointer-events-none opacity-20 dark:opacity-10" style={{ minHeight: "70vh" }}>
-        <AsciiWebsiteBackgroundGenerated />
+      {/* ASCII Video Background - forcefully scaled to cover the entire width and height */}
+      <div className="absolute inset-0 pointer-events-none opacity-20 dark:opacity-10 overflow-hidden flex items-center justify-center">
+        <div 
+          className="relative flex items-center justify-center"
+          style={{ 
+            width: "1872px", 
+            height: "425px",
+            transform: "scale(max(100vw / 1872, 150vh / 425))", 
+            transformOrigin: "center center",
+          }}
+        >
+          <AsciiWebsiteBackgroundGenerated />
+        </div>
       </div>
 
       {/* Content */}

@@ -114,7 +114,7 @@ function Result({ data, showBadge }: ResultProps) {
             href={url}
             className={({ focus }: { focus: boolean }) =>
               cn(
-                "x:mx-2.5 x:break-words x:rounded-md x:contrast-more:border",
+                "x:mx-2.5 x:break-words x:rounded-none x:contrast-more:border",
                 focus
                   ? "x:text-primary-600 x:contrast-more:border-current x:bg-primary-500/10"
                   : "x:text-gray-800 x:dark:text-gray-300 x:contrast-more:border-transparent",
@@ -320,9 +320,9 @@ export function ProjectSearch() {
     <kbd
       className={cn(
         "x:absolute x:my-1.5 x:select-none x:pointer-events-none x:end-1.5 x:transition-all",
-        "x:h-5 x:rounded x:bg-nextra-bg x:px-1.5 x:font-mono x:text-[11px] x:font-medium",
+        "x:h-5 x:bg-transparent x:px-1.5 x:font-mono x:text-[11px] x:font-medium",
         "x:text-gray-600 x:dark:text-gray-400",
-        "x:border nextra-border x:contrast-more:text-current",
+        "x:border x:border-border",
         "x:items-center x:gap-1 x:flex x:max-sm:hidden not-prose",
         (!mounted || focused) && "x:invisible x:opacity-0",
       )}
@@ -341,6 +341,36 @@ export function ProjectSearch() {
     ? `Search ${currentProject}...`
     : "Search...";
 
+  if (!mounted) {
+    return (
+      <div
+        className={cn(
+          "nextra-search",
+          "x:relative x:flex x:items-center",
+          "x:text-gray-900 x:dark:text-gray-300",
+          "x:contrast-more:text-gray-800 x:contrast-more:dark:text-gray-300",
+        )}
+      >
+        <input
+          spellCheck={false}
+          autoComplete="off"
+          type="search"
+          disabled
+          className={cn(
+            "x:px-3 x:py-2 x:transition-all",
+            "x:w-full x:md:w-64",
+            "x:text-base x:leading-tight x:md:text-sm",
+            "x:bg-transparent x:border x:border-border",
+            "x:placeholder:text-gray-600 x:dark:placeholder:text-gray-400",
+            "x:[&::-webkit-search-cancel-button]:appearance-none",
+          )}
+          placeholder={placeholder}
+        />
+        {shortcut}
+      </div>
+    );
+  }
+
   return (
     <Combobox onChange={handleSelect}>
       <div
@@ -358,14 +388,14 @@ export function ProjectSearch() {
           type="search"
           className={({ focus }: { focus: boolean }) =>
             cn(
-              "x:rounded-lg x:px-3 x:py-2 x:transition-all",
+              "x:px-3 x:py-2 x:transition-all",
               "x:w-full x:md:w-64",
               "x:text-base x:leading-tight x:md:text-sm",
+              "x:bg-transparent x:border",
               focus
-                ? "x:bg-transparent x:nextra-focus"
-                : "x:bg-black/[.05] x:dark:bg-gray-50/10",
+                ? "x:border-primary x:nextra-focus"
+                : "x:border-border",
               "x:placeholder:text-gray-600 x:dark:placeholder:text-gray-400",
-              "x:contrast-more:border x:contrast-more:border-current",
               "x:[&::-webkit-search-cancel-button]:appearance-none",
             )
           }
@@ -383,19 +413,19 @@ export function ProjectSearch() {
         anchor={{ to: "top end", gap: 10, padding: 16 }}
         className={cn(
           "nextra-search-results nextra-scrollbar x:max-md:h-full",
-          "x:border x:border-gray-200 x:text-gray-100 x:dark:border-neutral-800",
-          "x:z-30 x:rounded-xl x:py-2.5 x:shadow-xl",
+          "x:border x:border-border x:text-gray-100",
+          "x:z-30 x:py-2.5 x:rounded-none x:shadow-none",
           "x:contrast-more:border x:contrast-more:border-gray-900 x:contrast-more:dark:border-gray-50",
           "x:backdrop-blur-md x:bg-nextra-bg/70",
           "x:motion-reduce:transition-none",
           "x:origin-top x:transition x:duration-200 x:ease-out x:data-closed:scale-95 x:data-closed:opacity-0 x:empty:invisible",
           error || isLoading || !results.length
             ? [
-                "x:md:min-h-28 x:grow x:flex x:justify-center x:text-sm x:gap-2 x:px-8",
-                error
-                  ? "x:text-red-500 x:items-start"
-                  : "x:text-gray-400 x:items-center",
-              ]
+              "x:md:min-h-28 x:grow x:flex x:justify-center x:text-sm x:gap-2 x:px-8",
+              error
+                ? "x:text-red-500 x:items-start"
+                : "x:text-gray-400 x:items-center",
+            ]
             : "x:md:max-h-[min(calc(100vh-5rem),400px)]!",
           "x:w-full x:md:w-[576px]",
         )}

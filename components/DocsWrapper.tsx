@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { useProject } from "@/lib/project-context";
 import { useVersion } from "@/lib/version-context";
 import { PagefindMetadata } from "./PagefindMetadata";
+import { PageTransition } from "./ui/motion";
 
 interface DocsWrapperProps {
   toc: Heading[];
@@ -64,7 +65,9 @@ export function DocsWrapper({
         version={currentVersion}
         isLatestVersion={isLatestVersion}
       />
-      {children}
+      <PageTransition className="min-w-0">
+        {children}
+      </PageTransition>
     </DefaultWrapper>
   );
 }

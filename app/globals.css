@@ -24,7 +24,7 @@
   --border: #e5e7eb;
   --input: #e5e7eb;
   --ring: #0000ee;
-  
+
   --sidebar: #f9fafb;
   --sidebar-foreground: #000000;
   --sidebar-primary: #0000ee;
@@ -34,11 +34,12 @@
   --sidebar-border: #e5e7eb;
   --sidebar-ring: #0000ee;
 
-  --radius: 0rem; /* Brutalist sharp corners */
+  --radius: 0rem;
+  /* Brutalist sharp corners */
   --font-sans: "Inter", sans-serif;
   --font-serif: "Inter", sans-serif;
   --font-mono: "Geist Mono", monospace;
-  
+
   --tracking-normal: 0em;
 }
 
@@ -115,7 +116,7 @@ body {
   --border: #27272a;
   --input: #27272a;
   --ring: #0000ee;
-  
+
   --sidebar: #09090b;
   --sidebar-foreground: #fafafa;
   --sidebar-primary: #0000ee;
@@ -124,7 +125,7 @@ body {
   --sidebar-accent-foreground: #fafafa;
   --sidebar-border: #27272a;
   --sidebar-ring: #0000ee;
-  
+
   --radius: 0rem;
 }
 
@@ -136,7 +137,9 @@ body {
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    border-radius: 0;
   }
+
   body {
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
@@ -149,6 +152,7 @@ body {
     opacity: 0;
     transform: translateY(4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -164,6 +168,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -192,6 +197,7 @@ body {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -204,35 +210,33 @@ body {
 
 /* Animated gradient background - grayscale */
 @keyframes gradient-shift {
+
   0%,
   100% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
 }
 
 .animated-gradient {
-  background: linear-gradient(
-    -45deg,
-    oklch(0.97 0 0),
-    oklch(0.93 0 0),
-    oklch(0.95 0 0),
-    oklch(0.97 0 0)
-  );
+  background: linear-gradient(-45deg,
+      oklch(0.97 0 0),
+      oklch(0.93 0 0),
+      oklch(0.95 0 0),
+      oklch(0.97 0 0));
   background-size: 400% 400%;
   animation: gradient-shift 15s ease infinite;
 }
 
 .dark .animated-gradient {
-  background: linear-gradient(
-    -45deg,
-    oklch(0.181 0.0165 274),
-    oklch(0.21 0.025 274),
-    oklch(0.195 0.02 274),
-    oklch(0.181 0.0165 274)
-  );
+  background: linear-gradient(-45deg,
+      oklch(0.181 0.0165 274),
+      oklch(0.21 0.025 274),
+      oklch(0.195 0.02 274),
+      oklch(0.181 0.0165 274));
   background-size: 400% 400%;
   animation: gradient-shift 15s ease infinite;
 }
@@ -448,10 +452,10 @@ div:has(> footer) {
   z-index: 10;
 }
 
-/* Nextra theme overrides */
+/* Nextra theme overrides - MINIMAL */
 .nextra-nav-container {
   background: var(--background);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border) !important;
 }
 
 .nextra-nav-container-blur {
@@ -466,46 +470,83 @@ div:has(> footer) {
 /* Sidebar styling */
 .nextra-sidebar-container {
   background: var(--sidebar);
+  border-right: 1px solid var(--border) !important;
 }
 
 .nextra-sidebar-container a {
   color: var(--sidebar-foreground);
+  transition: none !important;
 }
 
 .nextra-sidebar-container a:hover {
-  color: var(--sidebar-primary);
-  background: var(--sidebar-accent);
+  background: var(--foreground) !important;
+  color: var(--background) !important;
 }
 
 .nextra-sidebar-container a[aria-current="page"] {
-  color: var(--sidebar-primary);
-  background: var(--sidebar-accent);
-  font-weight: 600;
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  font-weight: 700;
+  border: 1px solid var(--foreground);
 }
 
 /* TOC styling */
 .nextra-toc a {
   color: var(--muted-foreground);
+  transition: none !important;
 }
 
 .nextra-toc a:hover {
   color: var(--foreground);
+  background: var(--muted);
 }
 
 .nextra-toc a[aria-current="true"] {
   color: var(--primary);
-  font-weight: 500;
+  font-weight: 700;
+  border-left: 2px solid var(--primary);
+  padding-left: 0.5rem;
 }
 
 /* Search styling */
 .nextra-search input {
-  background: var(--input);
-  border-color: var(--border);
-  color: var(--foreground);
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--foreground) !important;
+  color: var(--foreground) !important;
+  font-family: var(--font-mono);
+  transition: border-color 0.2s ease;
+}
+
+.nextra-search input:hover {
+  border-bottom-color: var(--primary) !important;
+}
+
+.nextra-search input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-bottom-color: var(--primary) !important;
 }
 
 .nextra-search input::placeholder {
   color: var(--muted-foreground);
+}
+
+/* Search Dropdown styling */
+[class*="nextra-search-results"] {
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
+  background: var(--background) !important;
+}
+
+[class*="nextra-search-results"] li {
+  border-bottom: 1px solid var(--border);
+}
+
+[class*="nextra-search-results"] a:hover,
+[class*="nextra-search-results"] a[aria-selected="true"] {
+  background: var(--foreground) !important;
+  color: var(--background) !important;
 }
 
 /* Code block styling */
@@ -515,6 +556,24 @@ pre {
 
 code {
   font-family: var(--font-mono);
+}
+
+/* Documentation Content Links */
+article a[href]:not(.nextra-cards *):not(:has(img)) {
+  color: #0000ee !important;
+  text-decoration: underline;
+  text-decoration-color: #0000ee !important;
+  text-underline-offset: 2px;
+  font-weight: 500;
+}
+
+article a[href]:not(.nextra-cards *):not(:has(img)):hover {
+  opacity: 0.8;
+}
+
+.dark article a[href]:not(.nextra-cards *):not(:has(img)) {
+  color: #a1a1aa !important;
+  text-decoration-color: #a1a1aa !important;
 }
 
 /* Sidebar selectors (rendered as Nextra separator items) */
@@ -538,6 +597,7 @@ code {
 
 /* Mobile improvements */
 @media (max-width: 767px) {
+
   /* Touch-friendly sidebar links (min 44px targets) */
   .nextra-sidebar a,
   .nextra-mobile-nav a {
@@ -547,7 +607,7 @@ code {
   }
 
   /* Hide "Copy page" button on mobile */
-  article > div[class*="float-end"] {
+  article>div[class*="float-end"] {
     display: none;
   }
 

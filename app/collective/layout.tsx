@@ -2,10 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 import Link from "next/link";
 import type { Folder, MdxFile, PageMapItem } from "nextra";
-import { Layout, Navbar, ThemeSwitch } from "nextra-theme-docs";
+import { Layout, Navbar } from "nextra-theme-docs";
+import { SimpleThemeToggle } from "@/components/SimpleThemeToggle";
 import CustomFooter from "@/components/home/Footer";
 import { ProjectSearch } from "@/components/ProjectSearch";
-import "nextra-theme-docs/style.css";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content", "collective");
 
@@ -140,7 +140,7 @@ export default function CollectiveLayout({
         </div>
       }
     >
-      <ThemeSwitch />
+      <SimpleThemeToggle />
     </Navbar>
   );
 

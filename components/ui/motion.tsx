@@ -27,6 +27,28 @@ export const SectionReveal = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
 SectionReveal.displayName = "SectionReveal";
 
 // ----------------------------------------------------------------------
+// Page Transition
+// ----------------------------------------------------------------------
+export const PageTransition = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
+  ({ children, ...props }, ref) => {
+    const shouldReduceMotion = useReducedMotion();
+
+    return (
+      <motion.div
+        ref={ref}
+        initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        {...props}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+);
+PageTransition.displayName = "PageTransition";
+
+// ----------------------------------------------------------------------
 // Stagger Container & Item
 // ----------------------------------------------------------------------
 export const StaggerContainer = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(

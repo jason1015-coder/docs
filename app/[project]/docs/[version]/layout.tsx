@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { Layout, Navbar, ThemeSwitch } from "nextra-theme-docs";
+import { Layout, Navbar } from "nextra-theme-docs";
+import { SimpleThemeToggle } from "@/components/SimpleThemeToggle";
 import CustomFooter from "@/components/home/Footer";
 import { SidebarSelectors } from "@/components/SidebarSelectors";
 import { buildPageMapForVersion } from "@/lib/page-map-builder";
@@ -7,7 +8,6 @@ import { ProjectProvider } from "@/lib/project-context";
 import { getProject } from "@/lib/projects";
 import { VersionProvider } from "@/lib/version-context";
 import { getVersions, resolveVersion } from "@/lib/versions";
-import "nextra-theme-docs/style.css";
 import Link from "next/link";
 import { ProjectSearch } from "@/components/ProjectSearch";
 
@@ -83,7 +83,7 @@ export default async function DocsLayout({ children, params }: LayoutProps) {
         </div>
       }
     >
-      <ThemeSwitch />
+      <SimpleThemeToggle />
     </Navbar>
   );
 
