@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Folder, MdxFile, MetaJsonFile, PageMapItem } from "nextra";
-import { Layout, Navbar, ThemeSwitch } from "nextra-theme-docs";
+import { Layout, Navbar } from "nextra-theme-docs";
 import { getApps, getLibraries } from "@/lib/projects";
+import { SimpleThemeToggle } from "./SimpleThemeToggle";
 import Footer from "./home/Footer";
 import { ProjectSearch } from "./ProjectSearch";
 import { TooltipProvider } from "./ui/tooltip";
@@ -21,7 +22,7 @@ export function MainLayout({ children, showSidebar = false }: MainLayoutProps) {
         </Link>
       }
     >
-      <ThemeSwitch />
+      <SimpleThemeToggle />
     </Navbar>
   );
 

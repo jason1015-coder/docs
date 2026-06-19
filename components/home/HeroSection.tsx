@@ -1,37 +1,27 @@
 "use client";
 
-import { BookOpen, ExternalLink, GitBranch } from "lucide-react";
-import { EffectScene } from "@/components/home/EffectScene";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import AsciiWebsiteBackgroundGenerated from "@/components/home/AsciiWebsiteBackgroundGenerated";
 
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden min-h-[70vh]">
       {/* ASCII Video Background - full screen absolute */}
-      <div className="absolute inset-0" style={{ minHeight: "70vh" }}>
-        <EffectScene />
+      <div className="absolute inset-0 pointer-events-none opacity-20 dark:opacity-10" style={{ minHeight: "70vh" }}>
+        <AsciiWebsiteBackgroundGenerated />
       </div>
-
-      {/* Gradient overlays - uses hero-overlay class */}
-      <div className="absolute inset-0 pointer-events-none hero-overlay" />
 
       {/* Content */}
       <div className="container mx-auto px-4 py-24 sm:py-32 relative z-10">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Badge */}
           <div className="inline-block animate-on-scroll">
-            <Badge
-              variant="secondary"
-              className="mb-4 text-sm px-4 py-1.5 bg-background/80 backdrop-blur-sm"
-            >
-              <BookOpen className="mr-2 h-4 w-4" />
-              Documentation
-            </Badge>
+            <span className="font-mono text-sm font-bold text-[#0000EE] dark:text-[#A1A1AA]">
+              [ docs ]
+            </span>
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent animate-on-scroll animate-delay-100">
+          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-foreground animate-on-scroll animate-delay-100">
             Nano Docs
           </h1>
 
@@ -43,35 +33,24 @@ export function HeroSection() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 animate-on-scroll animate-delay-300">
-            <Button
-              size="lg"
-              className="group text-base w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90"
-              asChild
+            <a
+              href="https://github.com/Nano-Collective"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-12 items-center justify-center bg-[#0000EE] dark:bg-foreground px-8 text-sm font-semibold tracking-wide text-white dark:text-background transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground w-full sm:w-auto group"
             >
-              <a
-                href="https://github.com/Nano-Collective"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <GitBranch className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
-                View on GitHub
-              </a>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="group text-base w-full sm:w-auto"
-              asChild
+              <span className="mr-3 font-bold text-white dark:text-background transition-colors">&gt;</span> 
+              View on GitHub
+            </a>
+            <a
+              href="https://nanocollective.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-12 items-center justify-center border border-foreground/20 bg-transparent px-8 text-sm font-semibold tracking-wide text-foreground transition-colors hover:bg-foreground hover:text-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black w-full sm:w-auto group"
             >
-              <a
-                href="https://nanocollective.org"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <ExternalLink className="mr-2 h-5 w-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                Main Website
-              </a>
-            </Button>
+              <span className="mr-3 font-bold text-[#0000EE] dark:text-[#A1A1AA] group-hover:text-background transition-colors">&gt;</span> 
+              Main Website
+            </a>
           </div>
         </div>
       </div>

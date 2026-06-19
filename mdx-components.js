@@ -5,6 +5,7 @@ import { ProjectCardsSection } from "./components/home/ProjectCardsSection";
 import { QuickLinksSection } from "./components/home/QuickLinksSection";
 import { ProjectList } from "./components/ProjectList";
 import { WhitepaperMetaInline } from "./components/WhitepaperMeta";
+import { SectionReveal, StaggerContainer, StaggerItem, CardHover } from "./components/ui/motion";
 
 // Get the default MDX components
 const themeComponents = getThemeComponents();
@@ -32,6 +33,10 @@ export function useMDXComponents(components) {
     QuickLinksSection,
     ProjectCardsSection,
     CollectiveDocsSection,
+    SectionReveal,
+    StaggerContainer,
+    StaggerItem,
+    CardHover,
     ...components,
   };
 }

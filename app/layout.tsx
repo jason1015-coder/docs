@@ -1,28 +1,20 @@
 import type { Metadata } from "next";
-import { Fira_Code, Lora, Poppins } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import { Head } from "nextra/components";
 import { JsonLd } from "@/components/JsonLd";
+import { SectionReveal } from "@/components/ui/motion";
 import "nextra-theme-docs/style.css";
 import "./globals.css";
 
-const poppins = Poppins({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins",
+  variable: "--font-sans",
   display: "swap",
 });
 
-const lora = Lora({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-lora",
-  display: "swap",
-});
-
-const firaCode = Fira_Code({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-fira-code",
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -71,7 +63,7 @@ export default function RootLayout({
       lang="en"
       dir="ltr"
       suppressHydrationWarning
-      className={`${poppins.variable} ${lora.variable} ${firaCode.variable}`}
+      className={`${inter.variable} ${inter.variable} ${geistMono.variable}`}
     >
       <Head />
       <body className="antialiased">
@@ -88,7 +80,9 @@ export default function RootLayout({
             },
           }}
         />
-        {children}
+        <SectionReveal>
+          {children}
+        </SectionReveal>
       </body>
     </html>
   );
