@@ -65,9 +65,7 @@ export function DocsWrapper({
         version={currentVersion}
         isLatestVersion={isLatestVersion}
       />
-      <PageTransition className="min-w-0">
-        {children}
-      </PageTransition>
+      <PageTransition className="min-w-0">{children}</PageTransition>
     </DefaultWrapper>
   );
 }

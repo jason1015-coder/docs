@@ -3,10 +3,10 @@ import path from "node:path";
 import { notFound, redirect } from "next/navigation";
 import { compileMdx } from "nextra/compile";
 import { evaluate } from "nextra/evaluate";
+import { Suspense } from "react";
 import { MainLayout } from "@/components/MainLayout";
 import { getAllProjects, getProject } from "@/lib/projects";
 import { useMDXComponents } from "../../mdx-components";
-import { Suspense } from "react";
 
 interface PageProps {
   params: Promise<{
@@ -51,7 +51,13 @@ export async function generateStaticParams() {
   return [...projectParams, ...contentParams];
 }
 
-async function CompiledContent({ projectId, localContent }: { projectId: string; localContent: string }) {
+async function CompiledContent({
+  projectId,
+  localContent,
+}: {
+  projectId: string;
+  localContent: string;
+}) {
   const components = useMDXComponents({});
   const compiledSource = await compileMdx(localContent, {
     filePath: `content/${projectId}.mdx`,
@@ -75,7 +81,15 @@ export default async function ProjectPage({ params }: PageProps) {
   const localContent = getLocalContent(projectId);
   if (localContent) {
     return (
-      <Suspense fallback={<MainLayout><div className="p-12 text-center opacity-50 font-mono text-sm uppercase tracking-widest">[ COMPILING_MDX... ]</div></MainLayout>}>
+      <Suspense
+        fallback={
+          <MainLayout>
+            <div className="p-12 text-center opacity-50 font-mono text-sm uppercase tracking-widest">
+              [ COMPILING_MDX... ]
+            </div>
+          </MainLayout>
+        }
+      >
         <CompiledContent projectId={projectId} localContent={localContent} />
       </Suspense>
     );

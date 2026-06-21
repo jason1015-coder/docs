@@ -392,9 +392,7 @@ export function ProjectSearch() {
               "x:w-full x:md:w-64",
               "x:text-base x:leading-tight x:md:text-sm",
               "x:bg-transparent x:border",
-              focus
-                ? "x:border-primary x:nextra-focus"
-                : "x:border-border",
+              focus ? "x:border-primary x:nextra-focus" : "x:border-border",
               "x:placeholder:text-gray-600 x:dark:placeholder:text-gray-400",
               "x:[&::-webkit-search-cancel-button]:appearance-none",
             )
@@ -421,11 +419,11 @@ export function ProjectSearch() {
           "x:origin-top x:transition x:duration-200 x:ease-out x:data-closed:scale-95 x:data-closed:opacity-0 x:empty:invisible",
           error || isLoading || !results.length
             ? [
-              "x:md:min-h-28 x:grow x:flex x:justify-center x:text-sm x:gap-2 x:px-8",
-              error
-                ? "x:text-red-500 x:items-start"
-                : "x:text-gray-400 x:items-center",
-            ]
+                "x:md:min-h-28 x:grow x:flex x:justify-center x:text-sm x:gap-2 x:px-8",
+                error
+                  ? "x:text-red-500 x:items-start"
+                  : "x:text-gray-400 x:items-center",
+              ]
             : "x:md:max-h-[min(calc(100vh-5rem),400px)]!",
           "x:w-full x:md:w-[576px]",
         )}

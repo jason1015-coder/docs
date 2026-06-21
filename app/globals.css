@@ -210,7 +210,6 @@ body {
 
 /* Animated gradient background - grayscale */
 @keyframes gradient-shift {
-
   0%,
   100% {
     background-position: 0% 50%;
@@ -222,21 +221,25 @@ body {
 }
 
 .animated-gradient {
-  background: linear-gradient(-45deg,
-      oklch(0.97 0 0),
-      oklch(0.93 0 0),
-      oklch(0.95 0 0),
-      oklch(0.97 0 0));
+  background: linear-gradient(
+    -45deg,
+    oklch(0.97 0 0),
+    oklch(0.93 0 0),
+    oklch(0.95 0 0),
+    oklch(0.97 0 0)
+  );
   background-size: 400% 400%;
   animation: gradient-shift 15s ease infinite;
 }
 
 .dark .animated-gradient {
-  background: linear-gradient(-45deg,
-      oklch(0.181 0.0165 274),
-      oklch(0.21 0.025 274),
-      oklch(0.195 0.02 274),
-      oklch(0.181 0.0165 274));
+  background: linear-gradient(
+    -45deg,
+    oklch(0.181 0.0165 274),
+    oklch(0.21 0.025 274),
+    oklch(0.195 0.02 274),
+    oklch(0.181 0.0165 274)
+  );
   background-size: 400% 400%;
   animation: gradient-shift 15s ease infinite;
 }
@@ -597,7 +600,6 @@ article a[href]:not(.nextra-cards *):not(:has(img)):hover {
 
 /* Mobile improvements */
 @media (max-width: 767px) {
-
   /* Touch-friendly sidebar links (min 44px targets) */
   .nextra-sidebar a,
   .nextra-mobile-nav a {
@@ -607,7 +609,7 @@ article a[href]:not(.nextra-cards *):not(:has(img)):hover {
   }
 
   /* Hide "Copy page" button on mobile */
-  article>div[class*="float-end"] {
+  article > div[class*="float-end"] {
     display: none;
   }
 

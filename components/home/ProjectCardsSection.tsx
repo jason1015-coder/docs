@@ -1,7 +1,4 @@
-import { ArrowRight, BookOpen } from "lucide-react";
 import Link from "next/link";
-
-
 
 import { getApps, getLibraries } from "@/lib/projects";
 
@@ -14,14 +11,12 @@ function ProjectCard({
 }) {
   const isProject = variant === "default";
   const tag = isProject ? "[ app ]" : "[ pkg ]";
-  
-  const exploreHref = isProject 
-    ? `https://nanocollective.org/${project.id}` 
+
+  const exploreHref = isProject
+    ? `https://nanocollective.org/${project.id}`
     : `https://github.com/Nano-Collective/${project.id}`;
-    
-  const exploreText = isProject 
-    ? `Explore ${project.name}` 
-    : `View on GitHub`;
+
+  const exploreText = isProject ? `Explore ${project.name}` : `View on GitHub`;
 
   return (
     <div className="bg-background border border-foreground/20 p-8 group hover:bg-muted transition-all hover:shadow-lg dark:hover:shadow-[0_4px_20px_rgb(0,0,0,0.5)] hover:-translate-y-1 flex flex-col h-full relative overflow-hidden">
@@ -32,7 +27,9 @@ function ProjectCard({
             <span className="font-mono text-xs sm:text-sm font-bold text-[#0000EE] dark:text-[#A1A1AA]">
               {tag}
             </span>
-            <h3 className="text-2xl md:text-3xl font-bold tracking-tight">{project.name}</h3>
+            <h3 className="text-2xl md:text-3xl font-bold tracking-tight">
+              {project.name}
+            </h3>
           </div>
         </div>
         <p className="text-sm sm:text-lg text-foreground/70 leading-relaxed mb-8 flex-grow">
@@ -43,7 +40,9 @@ function ProjectCard({
             href={`/${project.id}/docs`}
             className="inline-flex h-12 items-center justify-center bg-[#0000EE] dark:bg-foreground px-8 text-sm font-semibold tracking-wide text-white dark:text-background transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground w-full sm:w-auto group/btn"
           >
-            <span className="mr-3 font-bold text-white dark:text-background transition-colors">&gt;</span> 
+            <span className="mr-3 font-bold text-white dark:text-background transition-colors">
+              &gt;
+            </span>
             View Docs
           </Link>
           <a
@@ -52,7 +51,9 @@ function ProjectCard({
             rel="noopener noreferrer"
             className="inline-flex h-12 items-center justify-center border border-foreground/20 bg-transparent px-8 text-sm font-semibold tracking-wide text-foreground transition-colors hover:border-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black w-full sm:w-auto group/btn"
           >
-            <span className="mr-3 font-bold text-[#0000EE] dark:text-[#A1A1AA] transition-colors">&gt;</span>
+            <span className="mr-3 font-bold text-[#0000EE] dark:text-[#A1A1AA] transition-colors">
+              &gt;
+            </span>
             {exploreText}
           </a>
         </div>
@@ -72,7 +73,9 @@ export function ProjectCardsSection() {
         {apps.length > 0 && (
           <>
             <div className="mb-8 sm:mb-16 border-b border-foreground/20 pb-4 sm:pb-8">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">Nano Projects</h2>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
+                Nano Projects
+              </h2>
               <p className="text-xs sm:text-lg text-foreground/70 font-mono">
                 Full-fledged applications to boost your development workflow.
               </p>
@@ -93,7 +96,9 @@ export function ProjectCardsSection() {
         {libraries.length > 0 && (
           <>
             <div className="mb-8 sm:mb-16 border-b border-foreground/20 pb-4 sm:pb-8">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">Nano Libraries</h2>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
+                Nano Libraries
+              </h2>
               <p className="text-xs sm:text-lg text-foreground/70 font-mono">
                 Lightweight utilities to integrate into your projects.
               </p>

@@ -3,9 +3,9 @@ import path from "node:path";
 import { notFound } from "next/navigation";
 import { compileMdx } from "nextra/compile";
 import { evaluate } from "nextra/evaluate";
+import { Suspense } from "react";
 import { getWhitepaperIssueCounts } from "@/lib/whitepapers";
 import { useMDXComponents } from "../../../mdx-components";
-import { Suspense } from "react";
 
 interface PageProps {
   params: Promise<{
@@ -66,7 +66,13 @@ export async function generateStaticParams() {
   return collectSlugs(CONTENT_ROOT).map((slug) => ({ slug }));
 }
 
-async function CompiledCollectiveSlugContent({ slug, found }: { slug: string[]; found: { content: string; relPath: string } }) {
+async function CompiledCollectiveSlugContent({
+  slug,
+  found,
+}: {
+  slug: string[];
+  found: { content: string; relPath: string };
+}) {
   const components = useMDXComponents({});
   const compiledSource = await compileMdx(found.content, {
     filePath: `content/collective/${found.relPath}`,
@@ -109,7 +115,13 @@ export default async function CollectivePage({ params }: PageProps) {
   }
 
   return (
-    <Suspense fallback={<div className="p-12 text-center opacity-50 font-mono text-sm uppercase tracking-widest">[ COMPILING_MDX... ]</div>}>
+    <Suspense
+      fallback={
+        <div className="p-12 text-center opacity-50 font-mono text-sm uppercase tracking-widest">
+          [ COMPILING_MDX... ]
+        </div>
+      }
+    >
       <CompiledCollectiveSlugContent slug={slug} found={found} />
     </Suspense>
   );

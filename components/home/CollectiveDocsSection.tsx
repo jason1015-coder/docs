@@ -1,6 +1,4 @@
-import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { Button } from "../ui/button";
 
 export function CollectiveDocsSection() {
   return (
@@ -8,9 +6,12 @@ export function CollectiveDocsSection() {
       <div className="mx-auto max-w-5xl">
         <div className="border-t border-border/50 mb-16" />
         <div className="mb-8 sm:mb-16 border-b border-foreground/20 pb-4 sm:pb-8">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">The Collective</h2>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
+            The Collective
+          </h2>
           <p className="text-xs sm:text-lg text-foreground/70 font-mono">
-            Operational documentation for the Nano Collective — the shared conventions, playbooks, and values behind every project.
+            Operational documentation for the Nano Collective — the shared
+            conventions, playbooks, and values behind every project.
           </p>
         </div>
         <div className="bg-background border border-foreground/20 p-8 group hover:bg-muted transition-all hover:shadow-lg dark:hover:shadow-[0_4px_20px_rgb(0,0,0,0.5)] hover:-translate-y-1 flex flex-col h-full relative overflow-hidden">
@@ -21,7 +22,9 @@ export function CollectiveDocsSection() {
                 <span className="hidden sm:block font-mono text-xs sm:text-sm font-bold text-[#0000EE] dark:text-[#A1A1AA]">
                   [ core ]
                 </span>
-                <h3 className="text-2xl md:text-3xl font-bold tracking-tight">Nano Collective</h3>
+                <h3 className="text-2xl md:text-3xl font-bold tracking-tight">
+                  Nano Collective
+                </h3>
               </div>
             </div>
             <p className="text-sm sm:text-lg text-foreground/70 leading-relaxed mb-8 flex-grow">
@@ -34,7 +37,9 @@ export function CollectiveDocsSection() {
                 href="/collective"
                 className="inline-flex h-12 items-center justify-center bg-[#0000EE] dark:bg-foreground px-8 text-sm font-semibold tracking-wide text-white dark:text-background transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground w-full sm:w-auto group/btn"
               >
-                <span className="mr-3 font-bold text-white dark:text-background transition-colors">&gt;</span>
+                <span className="mr-3 font-bold text-white dark:text-background transition-colors">
+                  &gt;
+                </span>
                 View Docs
               </Link>
             </div>

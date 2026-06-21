@@ -5,7 +5,6 @@ import Custom500 from "@/components/500";
 
 export default function ErrorPage({
   error,
-  reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;

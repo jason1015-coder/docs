@@ -2,9 +2,9 @@ import Link from "next/link";
 import type { Folder, MdxFile, MetaJsonFile, PageMapItem } from "nextra";
 import { Layout, Navbar } from "nextra-theme-docs";
 import { getApps, getLibraries } from "@/lib/projects";
-import { SimpleThemeToggle } from "./SimpleThemeToggle";
 import Footer from "./home/Footer";
 import { ProjectSearch } from "./ProjectSearch";
+import { SimpleThemeToggle } from "./SimpleThemeToggle";
 import { TooltipProvider } from "./ui/tooltip";
 
 interface MainLayoutProps {

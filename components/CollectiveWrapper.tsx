@@ -4,8 +4,8 @@ import type { $NextraMetadata, Heading } from "nextra";
 import { useMDXComponents } from "nextra-theme-docs";
 import type { ReactNode } from "react";
 import type { WhitepaperIssueCounts } from "@/lib/whitepapers";
-import { WhitepaperMetaProvider } from "./WhitepaperMeta";
 import { PageTransition } from "./ui/motion";
+import { WhitepaperMetaProvider } from "./WhitepaperMeta";
 
 interface CollectiveWrapperProps {
   toc: Heading[];
@@ -65,9 +65,7 @@ export function CollectiveWrapper({
           issueCounts,
         }}
       >
-        <PageTransition className="min-w-0">
-          {children}
-        </PageTransition>
+        <PageTransition className="min-w-0">{children}</PageTransition>
       </WhitepaperMetaProvider>
     </DefaultWrapper>
   );

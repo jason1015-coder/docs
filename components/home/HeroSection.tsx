@@ -7,12 +7,12 @@ export function HeroSection() {
     <section className="relative overflow-hidden min-h-[70vh]">
       {/* ASCII Video Background - forcefully scaled to cover the entire width and height */}
       <div className="absolute inset-0 pointer-events-none opacity-20 dark:opacity-10 overflow-hidden flex items-center justify-center">
-        <div 
+        <div
           className="relative flex items-center justify-center"
-          style={{ 
-            width: "1872px", 
+          style={{
+            width: "1872px",
             height: "425px",
-            transform: "scale(max(100vw / 1872, 150vh / 425))", 
+            transform: "scale(max(100vw / 1872, 150vh / 425))",
             transformOrigin: "center center",
           }}
         >
@@ -49,7 +49,9 @@ export function HeroSection() {
               rel="noopener noreferrer"
               className="inline-flex h-12 items-center justify-center bg-[#0000EE] dark:bg-foreground px-8 text-sm font-semibold tracking-wide text-white dark:text-background transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground w-full sm:w-auto group"
             >
-              <span className="mr-3 font-bold text-white dark:text-background transition-colors">&gt;</span> 
+              <span className="mr-3 font-bold text-white dark:text-background transition-colors">
+                &gt;
+              </span>
               View on GitHub
             </a>
             <a
@@ -58,7 +60,9 @@ export function HeroSection() {
               rel="noopener noreferrer"
               className="inline-flex h-12 items-center justify-center border border-foreground/20 bg-transparent px-8 text-sm font-semibold tracking-wide text-foreground transition-colors hover:border-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black w-full sm:w-auto group"
             >
-              <span className="mr-3 font-bold text-[#0000EE] dark:text-[#A1A1AA] transition-colors">&gt;</span>
+              <span className="mr-3 font-bold text-[#0000EE] dark:text-[#A1A1AA] transition-colors">
+                &gt;
+              </span>
               Main Website
             </a>
           </div>

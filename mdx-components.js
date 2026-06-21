@@ -4,8 +4,13 @@ import { HeroSection } from "./components/home/HeroSection";
 import { ProjectCardsSection } from "./components/home/ProjectCardsSection";
 import { QuickLinksSection } from "./components/home/QuickLinksSection";
 import { ProjectList } from "./components/ProjectList";
+import {
+  CardHover,
+  SectionReveal,
+  StaggerContainer,
+  StaggerItem,
+} from "./components/ui/motion";
 import { WhitepaperMetaInline } from "./components/WhitepaperMeta";
-import { SectionReveal, StaggerContainer, StaggerItem, CardHover } from "./components/ui/motion";
 
 // Get the default MDX components
 const themeComponents = getThemeComponents();

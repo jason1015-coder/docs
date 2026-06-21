@@ -50,11 +50,7 @@ function daysUntil(iso: string): number | null {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
-export function StatusBadge({
-  status,
-  reviewOpens,
-  reviewCloses,
-}: StatusBadgeProps) {
+export function StatusBadge({ status, reviewCloses }: StatusBadgeProps) {
   const style = isValidStatus(status)
     ? STATUS_STYLES[status]
     : "bg-gray-500/15 text-gray-400 border-gray-500/30";

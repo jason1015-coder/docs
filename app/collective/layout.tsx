@@ -3,9 +3,9 @@ import path from "node:path";
 import Link from "next/link";
 import type { Folder, MdxFile, PageMapItem } from "nextra";
 import { Layout, Navbar } from "nextra-theme-docs";
-import { SimpleThemeToggle } from "@/components/SimpleThemeToggle";
 import CustomFooter from "@/components/home/Footer";
 import { ProjectSearch } from "@/components/ProjectSearch";
+import { SimpleThemeToggle } from "@/components/SimpleThemeToggle";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content", "collective");
 

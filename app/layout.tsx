@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Inter } from "next/font/google";
 import { Head } from "nextra/components";
 import { JsonLd } from "@/components/JsonLd";
 import { SectionReveal } from "@/components/ui/motion";
@@ -82,9 +82,7 @@ export default function RootLayout({
             },
           }}
         />
-        <SectionReveal>
-          {children}
-        </SectionReveal>
+        <SectionReveal>{children}</SectionReveal>
       </body>
     </html>
   );

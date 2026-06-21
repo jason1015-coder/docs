@@ -1,6 +1,6 @@
 "use client";
 
-import { HTMLMotionProps, motion, useReducedMotion } from "framer-motion";
+import { type HTMLMotionProps, motion, useReducedMotion } from "framer-motion";
 import { forwardRef } from "react";
 
 // ----------------------------------------------------------------------
@@ -22,59 +22,61 @@ export const SectionReveal = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
         {children}
       </motion.div>
     );
-  }
+  },
 );
 SectionReveal.displayName = "SectionReveal";
 
 // ----------------------------------------------------------------------
 // Page Transition
 // ----------------------------------------------------------------------
-export const PageTransition = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
-  ({ children, ...props }, ref) => {
-    const shouldReduceMotion = useReducedMotion();
+export const PageTransition = forwardRef<
+  HTMLDivElement,
+  HTMLMotionProps<"div">
+>(({ children, ...props }, ref) => {
+  const shouldReduceMotion = useReducedMotion();
 
-    return (
-      <motion.div
-        ref={ref}
-        initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-);
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+});
 PageTransition.displayName = "PageTransition";
 
 // ----------------------------------------------------------------------
 // Stagger Container & Item
 // ----------------------------------------------------------------------
-export const StaggerContainer = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
-  ({ children, ...props }, ref) => {
-    return (
-      <motion.div
-        ref={ref}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.1 }}
-        variants={{
-          hidden: { opacity: 0 },
-          visible: {
-            opacity: 1,
-            transition: {
-              staggerChildren: 0.08,
-            },
+export const StaggerContainer = forwardRef<
+  HTMLDivElement,
+  HTMLMotionProps<"div">
+>(({ children, ...props }, ref) => {
+  return (
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.08,
           },
-        }}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-);
+        },
+      }}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+});
 StaggerContainer.displayName = "StaggerContainer";
 
 export const StaggerItem = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
@@ -93,49 +95,51 @@ export const StaggerItem = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
         {children}
       </motion.div>
     );
-  }
+  },
 );
 StaggerItem.displayName = "StaggerItem";
 
 // ----------------------------------------------------------------------
 // Subtle Hover & Interactions
 // ----------------------------------------------------------------------
-export const SubtleButton = forwardRef<HTMLButtonElement, HTMLMotionProps<"button">>(
-  ({ children, ...props }, ref) => {
-    const shouldReduceMotion = useReducedMotion();
+export const SubtleButton = forwardRef<
+  HTMLButtonElement,
+  HTMLMotionProps<"button">
+>(({ children, ...props }, ref) => {
+  const shouldReduceMotion = useReducedMotion();
 
-    return (
-      <motion.button
-        ref={ref}
-        whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
-        whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
-        transition={{ duration: 0.15 }}
-        {...props}
-      >
-        {children}
-      </motion.button>
-    );
-  }
-);
+  return (
+    <motion.button
+      ref={ref}
+      whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+      whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+      transition={{ duration: 0.15 }}
+      {...props}
+    >
+      {children}
+    </motion.button>
+  );
+});
 SubtleButton.displayName = "SubtleButton";
 
-export const SubtleButtonLink = forwardRef<HTMLAnchorElement, HTMLMotionProps<"a">>(
-  ({ children, ...props }, ref) => {
-    const shouldReduceMotion = useReducedMotion();
+export const SubtleButtonLink = forwardRef<
+  HTMLAnchorElement,
+  HTMLMotionProps<"a">
+>(({ children, ...props }, ref) => {
+  const shouldReduceMotion = useReducedMotion();
 
-    return (
-      <motion.a
-        ref={ref}
-        whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
-        whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
-        transition={{ duration: 0.15 }}
-        {...props}
-      >
-        {children}
-      </motion.a>
-    );
-  }
-);
+  return (
+    <motion.a
+      ref={ref}
+      whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+      whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+      transition={{ duration: 0.15 }}
+      {...props}
+    >
+      {children}
+    </motion.a>
+  );
+});
 SubtleButtonLink.displayName = "SubtleButtonLink";
 
 export const CardHover = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
@@ -152,26 +156,27 @@ export const CardHover = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
         {children}
       </motion.div>
     );
-  }
+  },
 );
 CardHover.displayName = "CardHover";
 
-export const UpdateItemHover = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
-  ({ children, ...props }, ref) => {
-    const shouldReduceMotion = useReducedMotion();
+export const UpdateItemHover = forwardRef<
+  HTMLDivElement,
+  HTMLMotionProps<"div">
+>(({ children, ...props }, ref) => {
+  const shouldReduceMotion = useReducedMotion();
 
-    return (
-      <motion.div
-        ref={ref}
-        whileHover={shouldReduceMotion ? undefined : { x: 4 }}
-        transition={{ duration: 0.15 }}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-);
+  return (
+    <motion.div
+      ref={ref}
+      whileHover={shouldReduceMotion ? undefined : { x: 4 }}
+      transition={{ duration: 0.15 }}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+});
 UpdateItemHover.displayName = "UpdateItemHover";
 
 // ----------------------------------------------------------------------
@@ -191,6 +196,6 @@ export const FadeIn = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
         {children}
       </motion.div>
     );
-  }
+  },
 );
 FadeIn.displayName = "FadeIn";
