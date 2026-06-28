@@ -6,7 +6,7 @@ proposer: "Will Lamerton"
 proposer_github: "will-lamerton"
 status: "In public review"
 review_opens: "2026-05-20"
-review_closes: "2026-06-19"
+review_closes: "2026-07-01"
 ---
 
 # NanoOS

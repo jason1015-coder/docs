@@ -4,7 +4,7 @@ description: "A working whitepaper for a small open source tool that scrubs iden
 sidebar_order: 2
 proposer: "Will Lamerton"
 proposer_github: "will-lamerton"
-status: "In public review"
+status: "Building"
 review_opens: "2026-05-19"
 review_closes: "2026-06-18"
 ---

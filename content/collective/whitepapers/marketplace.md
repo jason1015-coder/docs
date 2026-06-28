@@ -6,7 +6,7 @@ proposer: "Matt Spence"
 proposer_github: "mrspence"
 status: "In public review"
 review_opens: "2026-05-27"
-review_closes: "2026-06-26"
+review_closes: "2026-07-01"
 ---
 
 # Marketplace (working title)

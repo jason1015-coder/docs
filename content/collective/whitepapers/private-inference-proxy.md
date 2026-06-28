@@ -4,7 +4,7 @@ description: "A working whitepaper for an open source proxy that lets users call
 sidebar_order: 1
 proposer: "Will Lamerton"
 proposer_github: "will-lamerton"
-status: "In public review"
+status: "Paused"
 review_opens: "2026-05-19"
 review_closes: "2026-06-18"
 ---
