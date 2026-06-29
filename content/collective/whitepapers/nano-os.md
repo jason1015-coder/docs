@@ -4,7 +4,7 @@ description: "A whitepaper for an open source agent orchestration CLI that lets 
 sidebar_order: 3
 proposer: "Will Lamerton"
 proposer_github: "will-lamerton"
-status: "In public review"
+status: "Paused"
 review_opens: "2026-05-20"
 review_closes: "2026-07-01"
 ---
