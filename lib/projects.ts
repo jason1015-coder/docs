@@ -37,7 +37,7 @@ export const PROJECTS: ProjectConfig[] = [
     id: "get-md",
     name: "get-md",
     description:
-      "A fast, lightweight HTML to Markdown converter optimized for LLM consumption.",
+      "A fast, lightweight HTML, PDF, DOCX, and Markdown to Markdown converter optimized for LLM consumption.",
     type: "library",
     repo: {
       owner: "Nano-Collective",

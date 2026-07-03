@@ -24,7 +24,7 @@ Every NC project lives at [github.com/Nano-Collective](https://github.com/Nano-C
 
 - **[Nanocoder](https://github.com/Nano-Collective/nanocoder)**: a coding agent in your terminal that runs on any model you choose.
 - **[Nanotune](https://github.com/Nano-Collective/nanotune)**: fine-tuning small models on Apple Silicon.
-- **[get-md](https://github.com/Nano-Collective/get-md)**: HTML to Markdown converter.
+- **[get-md](https://github.com/Nano-Collective/get-md)**: HTML, PDF, DOCX, and Markdown to Markdown converter.
 - **[json-up](https://github.com/Nano-Collective/json-up)**: JSON migration tool.
 
 Pick the one closest to what you actually use or care about.
