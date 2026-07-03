@@ -1,0 +1,57 @@
+name: Whitepapers Manifest
+
+# Regenerates public/whitepapers.json whenever any whitepaper frontmatter
+# changes on main. The committed file is the source the website fetches at
+# build time from https://docs.nanocollective.org/whitepapers.json.
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "content/collective/whitepapers/**.md"
+            - "scripts/generate-whitepapers-manifest.ts"
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+concurrency:
+    group: whitepapers-manifest-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    regenerate:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Set up PNPM
+              uses: pnpm/action-setup@v4
+              with:
+                  version: null
+
+            - name: Use Node.js 22
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: "pnpm"
+
+            - name: Install dependencies
+              run: pnpm install --no-frozen-lockfile
+
+            - name: Generate manifest
+              run: pnpm run whitepapers:manifest
+
+            - name: Commit manifest if changed
+              run: |
+                  if git diff --quiet public/whitepapers.json; then
+                    echo "Manifest unchanged. Nothing to commit."
+                    exit 0
+                  fi
+                  git config user.name "nc-bot"
+                  git config user.email "hello@nanocollective.org"
+                  git add public/whitepapers.json
+                  git commit -m "chore: regenerate whitepapers manifest [skip ci]"
+                  git push

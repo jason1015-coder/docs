@@ -4,11 +4,14 @@
   "private": true,
   "packageManager": "pnpm@11.0.9",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
+    "prebuild": "tsx scripts/generate-whitepapers-manifest.ts",
     "build": "next build",
     "start": "npx serve@latest out",
     "lint": "biome check",
     "format": "biome format --write",
+    "whitepapers:manifest": "tsx scripts/generate-whitepapers-manifest.ts",
+    "whitepapers:archive": "tsx scripts/archive-whitepapers.ts",
     "postbuild": "pagefind --site .next/server/app --output-path out/_pagefind && tsx scripts/generate-llms-content.ts"
   },
   "dependencies": {
@@ -23,6 +26,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.40.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.363.0",
     "next": "16.1.3",

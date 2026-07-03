@@ -3,6 +3,7 @@ import path from "node:path";
 import { notFound } from "next/navigation";
 import { compileMdx } from "nextra/compile";
 import { evaluate } from "nextra/evaluate";
+import { Suspense } from "react";
 import { useMDXComponents } from "../../mdx-components";
 
 function getIndexContent(): string | null {
@@ -22,11 +23,8 @@ function getIndexContent(): string | null {
   return null;
 }
 
-export default async function CollectiveIndexPage() {
+async function CompiledCollectiveContent({ content }: { content: string }) {
   const components = useMDXComponents({});
-  const content = getIndexContent();
-  if (!content) notFound();
-
   const compiledSource = await compileMdx(content, {
     filePath: "content/collective/index.mdx",
     defaultShowCopyCode: true,
@@ -49,5 +47,22 @@ export default async function CollectiveIndexPage() {
     >
       <MDXContent />
     </CollectiveWrapper>
+  );
+}
+
+export default async function CollectiveIndexPage() {
+  const content = getIndexContent();
+  if (!content) notFound();
+
+  return (
+    <Suspense
+      fallback={
+        <div className="p-12 text-center opacity-50 font-mono text-sm uppercase tracking-widest">
+          [ COMPILING_MDX... ]
+        </div>
+      }
+    >
+      <CompiledCollectiveContent content={content} />
+    </Suspense>
   );
 }

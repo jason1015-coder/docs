@@ -1,43 +1,47 @@
-import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { Button } from "../ui/button";
 
 export function CollectiveDocsSection() {
   return (
     <section id="collective" className="pt-16 pb-32 px-6">
       <div className="mx-auto max-w-5xl">
         <div className="border-t border-border/50 mb-16" />
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-3">The Collective</h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+        <div className="mb-8 sm:mb-16 border-b border-foreground/20 pb-4 sm:pb-8">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
+            The Collective
+          </h2>
+          <p className="text-xs sm:text-lg text-foreground/70 font-mono">
             Operational documentation for the Nano Collective — the shared
             conventions, playbooks, and values behind every project.
           </p>
         </div>
-        <div className="group overflow-hidden rounded-xl bg-card border border-border/50 hover:border-border transition-colors">
-          <div className="flex flex-col sm:flex-row">
-            <div className="w-full sm:w-1/2 min-h-[180px] bg-gradient-to-br from-[#bb9af7] to-[#7aa2f7] flex flex-col items-center justify-center p-8 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-30" />
-              <div className="relative z-10 text-center">
-                <h3 className="text-2xl font-bold text-white">
+        <div className="bg-background border border-foreground/20 p-8 group hover:bg-muted transition-all hover:shadow-lg dark:hover:shadow-[0_4px_20px_rgb(0,0,0,0.5)] hover:-translate-y-1 flex flex-col h-full relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 dark:opacity-100 pointer-events-none" />
+          <div className="relative z-10 flex flex-col h-full">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <span className="hidden sm:block font-mono text-xs sm:text-sm font-bold text-[#0000EE] dark:text-[#A1A1AA]">
+                  [ core ]
+                </span>
+                <h3 className="text-2xl md:text-3xl font-bold tracking-tight">
                   Nano Collective
                 </h3>
               </div>
             </div>
-            <div className="flex flex-col gap-4 w-full sm:w-1/2 p-8 bg-card">
-              <p className="text-muted-foreground text-lg">
-                How we work as a collective: repo and CI conventions, stack
-                suggestions, community and contribution guidelines — everything
-                that keeps projects consistent across the collective.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 mt-auto">
-                <Button asChild className="group/btn w-full sm:w-auto">
-                  <Link href="/collective">
-                    View Docs
-                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover/btn:translate-x-1" />
-                  </Link>
-                </Button>
-              </div>
+            <p className="text-sm sm:text-lg text-foreground/70 leading-relaxed mb-8 flex-grow">
+              How we work as a collective: repo and CI conventions, stack
+              suggestions, community and contribution guidelines — everything
+              that keeps projects consistent across the collective.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link
+                href="/collective"
+                className="inline-flex h-12 items-center justify-center bg-[#0000EE] dark:bg-foreground px-8 text-sm font-semibold tracking-wide text-white dark:text-background transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground w-full sm:w-auto group/btn"
+              >
+                <span className="mr-3 font-bold text-white dark:text-background transition-colors">
+                  &gt;
+                </span>
+                View Docs
+              </Link>
             </div>
           </div>
         </div>

@@ -1,10 +1,15 @@
 ---
-title: "Private Inference Proxy (working title)"
-description: "A working whitepaper for an open source proxy that lets users call cloud LLM providers with stronger privacy properties than a direct call"
+title: "Private Inference Proxy"
+description: "A working whitepaper for an open source proxy that lets users call cloud LLM providers with stronger privacy properties than a direct call. The proposer recommends the project be declined as currently scoped; reasoning is recorded in the Decision section."
 sidebar_order: 1
+proposer: "Will Lamerton"
+proposer_github: "will-lamerton"
+status: "Paused"
+review_opens: "2026-05-19"
+review_closes: "2026-06-18"
 ---
 
-# Private Inference Proxy (working title)
+# Private Inference Proxy
 
 Cloud LLM providers know who you are. When you call OpenAI, Anthropic, or any other hosted provider with your API key, the request carries your identity (the key, linked to your account and billing), your network location (your IP address), and your prompts (which often contain personal or organisational information). The provider can correlate every request you make over time and build a working profile of how you think, what you work on, and who you work for.
 
@@ -13,6 +18,8 @@ For most users today there is no way around this. Local models cover a growing s
 This whitepaper proposes a project to close part of that gap: an open source proxy that sits between users and cloud LLM providers and reduces what the provider, the network, and the proxy itself can learn about who is calling.
 
 The document is published in working form so the collective can argue the shape of it before code lands. Naming, scope, and design decisions below are open.
+
+> **Proposer's recommendation (2026-06-09): decline as currently scoped.** The proposer's reasoning is recorded in the "Decision" section near the end of the document. The whitepaper's frontmatter status is `In public review` because the collective's core team has not yet made a build / decline / iterate decision; the review window closes 2026-06-18. The rest of the whitepaper is preserved unchanged so reviewers can see the full design history.
 
 ## Problem
 
@@ -25,16 +32,20 @@ A direct call to a hosted LLM provider exposes the user along several axes at on
 
 These exposures stack. A user who is careful about (3) and (4) still loses to (1) and (2). A user who rotates keys still loses to (2) and (3). There is no single fix. There are layers, and the project needs to be honest about which layers it addresses and which it does not.
 
-## Intended audience (open)
+## Intended audience
 
-Privacy products only work when they are designed for a specific audience with a specific threat model. This project has not yet picked one, and that gap shapes every other decision below. Candidate audiences, with honest assessment of each:
+Privacy products only work when they are designed for a specific audience with a specific threat model. This project has two.
 
-- **Activists, journalists, dissidents.** Need the strongest stack (Mode A with payment privacy, composed with the Prompt Scrubber). Need to trust NC absolutely. The technical guarantees in a non TEE v1 do not justify that trust. Strong fit conceptually, weak fit in v1.
-- **Privacy curious developers and end users.** Care about privacy, but most already use a VPN. Will pay only if the proxy is materially better than rolling their own setup. The differentiator is "purpose built for LLM traffic, run by an org with stated values." Real, but narrow.
-- **Businesses with compliance requirements.** Want SOC2 audits, BAAs, written contracts. NC will not supply any of those without becoming a different kind of organisation. Out of scope unless the collective is willing to change its structure.
-- **Developers building LLM features into apps that handle sensitive user data.** Want a defensible privacy story they can offer their own users without rolling their own proxy. Probably the most realistic primary audience for this project. The whitepaper does not currently say this; if true, it should, or it should pick a different audience and say that instead.
+**Primary: developers building LLM features into apps that handle sensitive user data.** The person on the hook for the privacy promise in their own product, who needs a network-layer story they can defend in their own docs and to their own users. They will pay, will self-host if their users require it, and will compose with the Prompt Scrubber because they are already thinking in stacks. The pain is concrete: if their provider correlates a user's session, the developer is the one who has to answer for it. v1 is shaped for this audience.
 
-Picking the audience changes what v1 should optimise for. This question precedes mode scoping.
+**Secondary: developers who simply care about privacy** and want a purpose-built relay in front of their cloud LLM calls, regardless of whether they are shipping a product with users. The long tail of solo developers, indie hackers, privacy-curious tinkerers, and people building side projects where the privacy angle is a feature rather than a compliance requirement. This audience is broader on paper but the conversion story is softer: most say they value privacy, few will switch off a working direct call without low friction and an obvious win. The installable shape and the default Mode B posture serve this audience without extra design work.
+
+Audiences that the project does not serve in v1, named so the boundary is explicit:
+
+- **Activists, journalists, dissidents.** Need the strongest stack (Mode A with payment privacy, composed with the Prompt Scrubber) and need to trust NC absolutely. The technical guarantees in a non TEE v1 do not justify that trust. Strong fit conceptually, weak fit in v1, parked behind a confidential-compute milestone.
+- **Businesses with formal compliance requirements.** Want SOC2 audits, BAAs, written contracts. NC will not supply any of those without becoming a different kind of organisation. Out of scope unless the collective is willing to change its structure.
+
+Picking the audience unblocks mode scoping, billing posture, and the threat model below. The primary audience is the one v1 is sized for.
 
 ## Principles
 
@@ -44,7 +55,7 @@ The same three values that govern every Nano Collective project apply here, with
 - **Local-first.** Wherever possible, prefer local inference. This proxy is a bridge to external capability when external capability is genuinely needed. It does not exist to make cloud inference the default path, and self hosting is a first class supported mode.
 - **Open for all.** The full source is open, the protocol is documented, the deployment is reproducible. Anyone can run their own instance. The Nano Collective hosted instance is a convenience, not the only path.
 
-## Threat model (open)
+## Threat model
 
 Privacy work that does not name its threat model is decoration. The project needs to be explicit about what it defends against and what it does not. A first sketch, to be argued:
 
@@ -108,7 +119,7 @@ This section of the doc previously described content layer privacy as "Mode C" o
 
 ## Privacy properties by mode
 
-A working profile per mode, sharpened against the direct call baseline. To be argued and refined as the design firms up.
+A working profile per mode, sharpened against the direct call baseline. Preserved as the design history; the design itself is not being built out further, so this section is the reference shape, not a moving draft.
 
 ### Baseline: direct call (today)
 
@@ -195,7 +206,7 @@ Open issues, all to be argued:
 
 None of these block whitepaper work. All of them block shipping. Anyone proposing a launch timeline has to engage with this directly.
 
-## Architecture sketch (rough)
+## Architecture sketch
 
 At the depth of a napkin:
 
@@ -216,7 +227,7 @@ The proxy is, deliberately, not a model router or a prompt rewriter. Routing acr
 
 (A standalone client side scrubber was on the original "alternatives" list, then promoted to Mode C of the proxy, then extracted into its own sibling project. See the [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) whitepaper.)
 
-## Competitive landscape (open)
+## Competitive landscape
 
 The whitepaper has not yet engaged with what already exists in adjacent space. A non exhaustive list to research properly before scoping v1:
 
@@ -228,56 +239,87 @@ The question this section needs to answer: what does NC do that nothing else doe
 
 ## Open risks
 
-These are the concerns that could kill the project or force it into a different shape. They are different from the Open Questions below, which are design problems to argue. Risks are existential, not editorial. Listing them here so that no one is surprised later.
+These are the concerns that were identified during the public review window. They are the entry point for the "Decision" section near the end of the document, which records how they collectively argued the project out of a shippable v1 shape. Reading these in order is the cleanest way to follow how the proposal reached its current state.
 
-1. **Provider terms of service may forbid Mode A.** Several major providers' terms explicitly prohibit sharing API keys across users. Pooling keys to deliver Mode A may not be possible for the providers users actually want without explicit business relationships, which the collective does not currently have. If this turns out to be the case, Mode A as designed is not shippable, and the proxy project shrinks to Mode B alone.
+1. **Provider terms of service may forbid Mode A.** Several major providers' terms explicitly prohibit sharing API keys across users. Pooling keys to deliver Mode A may not be possible for the providers users actually want without explicit business relationships, which the collective does not currently have. If this turns out to be the case, Mode A as designed is not shippable, and the proxy project shrinks to Mode B alone. *The review-time research pass on Anthropic's Commercial Terms (D.4) and the equivalent posture at other frontier providers confirmed this risk. A "curated provider set" alternative was considered and recorded in the "Decision" section.*
 
-2. **Mode A's privacy story in v1 is weaker than it sounds.** Without TEE (parked in phase 2), "no retention by default" is policy, not proof. v1 Mode A asks users to swap one trust relationship (with their provider) for another (with NC). Whether that swap is materially better depends on belief in NC's values, not on technical guarantees. This is a real product, but it is a narrower one than the modes section implies.
+2. **Mode A's privacy story in v1 is weaker than it sounds.** Without TEE (parked in phase 2), "no retention by default" is policy, not proof. v1 Mode A asks users to swap one trust relationship (with their provider) for another (with NC). Whether that swap is materially better depends on belief in NC's values, not on technical guarantees. This is a real product, but it is a narrower one than the modes section implies. *Confirmed during review; recorded in the "Decision" section as part of the reasoning for declining.*
 
-3. **The legal entity question is structural, not operational.** Taking commercial payments at the scale this project implies almost certainly requires the collective to form a legal entity, or to partner with one. Forming an entity changes what the Nano Collective is. This is not a billing decision, it is a question about the future shape of the collective. It needs to be answered as such, not handled as an operational task.
+3. **The legal entity question is structural, not operational.** Taking commercial payments at the scale this project implies almost certainly requires the collective to form a legal entity, or to partner with one. Forming an entity changes what the Nano Collective is. This is not a billing decision, it is a question about the future shape of the collective. It needs to be answered as such, not handled as an operational task. *Recorded in the "Decision" section as one of the conditions under which a future proposal could revisit the proxy at this shape.*
 
-4. **Mode B's market is unclear.** The privacy gain over a generic VPN is "purpose built for LLM traffic and run by an organisation you might trust more." That is a marketing differentiator, not a technical one. Whether users will pay for it at the volume the project needs to sustain itself is genuinely uncertain.
+4. **Mode B's market is unclear.** The privacy gain over a generic VPN is "purpose built for LLM traffic and run by an organisation you might trust more." That is a marketing differentiator, not a technical one. Whether users will pay for it at the volume the project needs to sustain itself is genuinely uncertain. *Confirmed during review and recorded in the "Decision" section as the central reason Mode B alone does not earn a standalone project.*
 
-5. **The strongest composite privacy claim depends on the scrubber landing.** Without the scrubber, the proxy on its own does not address identity in the prompt content itself. That gap is real but not a proxy problem; it is tracked in the [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) whitepaper. The risk for this project is that messaging the proxy alone as "private LLM access" without the scrubber overstates what the proxy delivers.
+5. **The strongest composite privacy claim depends on the scrubber landing.** Without the scrubber, the proxy on its own does not address identity in the prompt content itself. That gap is real but not a proxy problem; it is tracked in the [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) whitepaper. The risk for this project is that messaging the proxy alone as "private LLM access" without the scrubber overstates what the proxy delivers. *Recorded in the "Decision" section as the argument for shipping the scrubber standalone rather than as part of a proxy project.*
 
-6. **No engagement with the competitive landscape yet.** See the section above. The whitepaper does not currently say what NC's defensible differentiator is beyond stated values. That answer has to exist before v1.
+6. **No engagement with the competitive landscape yet.** See the section above. The whitepaper does not currently say what NC's defensible differentiator is beyond stated values. That answer has to exist before v1. *Surfaced during review as a contributing reason Mode A in a curated-provider shape was not pursued: the market (OpenRouter, LiteLLM, Portkey, others) is already served by better-resourced projects.*
 
-7. **Audience is not yet picked.** See "Intended audience" near the top. The project cannot be properly sized until it picks who it is for. The risk is shipping something that tries to serve everyone and lands well for no one.
+7. **Audience is not yet picked.** Resolved: primary audience is developers building LLM features into apps that handle sensitive user data, with a secondary audience of privacy-valuing developers in general. See the "Intended audience" section. The risk that a project shaped for everyone lands well for no one is mitigated by sizing v1 for the primary audience and letting the installable shape and Mode B posture serve the secondary without extra design work. *Resolved. The audience selection was retained in the whitepaper because it is the part of the design history the rest of the decision depends on, even though the project the audience was sized for is being declined.*
 
 ## Open questions
 
-These are the questions the whitepaper exists to argue. Some need design answers, some need community input.
+These are the questions the whitepaper listed at publication. The reviewer-time reasoning that answered them — or surfaced that they could not be answered in a way that kept the project viable — is recorded in the "Decision" section near the end of the document. They are preserved here so reviewers can see what was open and how each line of argument was closed out.
 
-1. **Naming.** "Private Inference Proxy" is descriptive but heavy. The collective's naming conventions allow either a "Nano" prefixed name or a lowercase hyphenated utility name. Which fits the shape of this project?
-2. **Modes in v1.** Both A and B, or B first and A later? B is the lightest lift but the weakest claim. A is the stronger network privacy story, especially with payment privacy configured. The provider TOS question (see Open Risks) may force the answer.
-3. **Sequencing relative to the scrubber.** The [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) ships on a different timeline (probably first, since it has none of the legal entity or commercial layer blockers). Decide whether the proxy waits for the scrubber, ships alongside, or ships independently and integrates later.
-4. **Threat model bounds.** Where does the proxy explicitly stop? Legal compulsion, traffic analysis at the upstream proxy, side channels in shared infrastructure. Each should be named in scope or out of scope rather than left implicit.
-5. **Retention policy.** "No retention" is easy to claim and hard to verify. What is the minimum we must retain (abuse detection, rate limiting, billing in Mode A)? How do we prove we are not retaining more? Public dashboards, third party audits, reproducible deployment?
-6. **Confidential compute in v1 or phase 2?** TEE based deployment raises the bar significantly against insider risk but it is operationally expensive and would slow down the first release. Phased, with a clear gate?
-7. **Billing infrastructure and legal entity.** NC has no registered entity of its own and is fiscally hosted by the Open Source Collective, which is not a SaaS billing platform. Running paid modes requires resolving: who legally accepts the money, which payment processor is used, how tax and VAT are handled, and whether the collective forms an entity or leans on a partner. This is the single biggest non technical risk to the project.
-8. **Payment privacy rails for Mode A.** On top of the broader billing question above, Mode A's payment privacy configuration needs at least one rail where a credit top up does not bind to a legal identity. Crypto is the obvious answer. The harder questions are which specific rails, what residual leakage remains at the payment step, and what compliance posture the collective takes (KYC thresholds, jurisdictions, treasury policy).
-9. **Pricing levels.** Given prepaid credits are the preferred shape across modes: what is the Mode A margin on provider tokens, and what is the Mode B per call (or per token) proxy fee? What sustains the project without pricing out the users for whom privacy is the point or skewing incentives away from local-first? And: a single credit wallet that funds either mode, or two separate balances?
-10. **Provider terms of service.** Several providers have opinions about proxying and shared keys in their terms. We need a clean reading per provider and a position for cases where the proxy might violate TOS. We do not ship a project the collective cannot defend in the open.
-11. **Abuse handling under no retention.** Aggregated keys are abuse magnets. How do we detect and stop abuse without becoming a surveillance layer? Possible answers: hard rate limits, automated classification with no human review, opt in moderation that the user controls. None of these are perfect.
-12. **Self host parity.** Is the hosted instance functionally identical to the self host bundle, or do some features (shared key pools) only make sense hosted? The closer to identical, the stronger the openness claim.
-13. **Interaction with other collective projects.** Does Nanocoder route cloud calls through this proxy by default? The proxy is most valuable when the rest of the collective's tooling can opt in cleanly.
-14. **Failure mode honesty.** If the proxy goes down, what is the user's path? A degraded direct call with their key (Mode B style) is a privacy regression. Documenting the failure modes is part of the contract.
+1. **Naming.** "Private Inference Proxy" is descriptive but heavy. The collective's naming conventions allow either a "Nano" prefixed name or a lowercase hyphenated utility name. Which fits the shape of this project? *Closed: not pursued. The working title served its purpose for the whitepaper; the project is proposed as not viable, so a final name is not needed.*
 
-## Next steps
+2. **Modes in v1.** Both A and B, or B first and A later? B is the lightest lift but the weakest claim. A is the stronger network privacy story, especially with payment privacy configured. The provider TOS question (see Open Risks) may force the answer. *Closed: see "Decision" section. The review-time research on provider TOS confirmed that Mode A as designed is not shippable without a legal entity and provider relationships the collective does not have, and that a curated-provider Mode A would compete in a market already served by better-resourced projects. Mode B on its own does not earn a standalone project. Neither mode ships.*
 
-For this whitepaper to graduate into docs:
+3. **Sequencing relative to the scrubber.** The [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) ships on a different timeline (probably first, since it has none of the legal entity or commercial layer blockers). Decide whether the proxy waits for the scrubber, ships alongside, or ships independently and integrates later. *Closed: not applicable. The scrubber continues independently as its own project. The composition point is recorded in the "Decision" section as something a future, smaller Mode B-shaped proposal could revisit if a real use case surfaced, without needing a full proxy project.*
 
-- [ ] Pick the intended audience. Everything below depends on this.
-- [ ] Address the Open Risks above, especially provider TOS (could kill Mode A) and the legal entity question (could reshape what the collective is).
-- [ ] Map the competitive landscape and write a clean differentiator statement.
-- [ ] Resolve naming.
-- [ ] Decide sequencing relative to the [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) project.
-- [ ] Pick which proxy modes ship in v1 and the order they ship in.
-- [ ] Decide the billing infrastructure path (legal entity, payment processor, what OSC can and cannot host).
-- [ ] Land a concrete threat model document (its own page once this whitepaper splits into a real project).
-- [ ] Sketch the rate limit and abuse detection design under a no retention policy.
-- [ ] Confirm at least one committed maintainer and one design partner from the collective.
+4. **Threat model bounds.** Where does the proxy explicitly stop? Legal compulsion, traffic analysis at the upstream proxy, side channels in shared infrastructure. Each should be named in scope or out of scope rather than left implicit. *Closed: not applicable. The threat model section above is preserved as the design history; a future proposal would need to land a concrete threat model document as part of its own graduation checklist.*
 
-When those are settled, this document becomes the foundation of the project's README and design notes. The repository is created under [`Nano-Collective`](https://github.com/Nano-Collective), and the [Creating a New Project](/collective/projects/creating-a-new-project) playbook takes over.
+5. **Retention policy.** "No retention" is easy to claim and hard to verify. What is the minimum we must retain (abuse detection, rate limiting, billing in Mode A)? How do we prove we are not retaining more? Public dashboards, third party audits, reproducible deployment? *Closed: not applicable. The no-retention default and the verification posture (public policy, reproducible deployment, third-party audit deferred to phase 2) were the design's working answer; a future proposal carries them forward only if a project actually exists to enforce them in code.*
 
-This page stays in place after the project ships, as the historical record of how the design was argued.
+6. **Confidential compute in v1 or phase 2?** TEE based deployment raises the bar significantly against insider risk but it is operationally expensive and would slow down the first release. Phased, with a clear gate? *Closed: not applicable. Confidential compute was the only credible path to making Mode A's trust story not a "trust us" posture, and is recorded in the "Decision" section as one of the conditions under which a future proposal could revisit Mode A.*
+
+7. **Billing infrastructure and legal entity.** NC has no registered entity of its own and is fiscally hosted by the Open Source Collective, which is not a SaaS billing platform. Running paid modes requires resolving: who legally accepts the money, which payment processor is used, how tax and VAT are handled, and whether the collective forms an entity or leans on a partner. This is the single biggest non technical risk to the project. *Closed: not applicable. Recorded in the "Decision" section as a structural question the collective would have to answer as a precondition for any future Mode A.*
+
+8. **Payment privacy rails for Mode A.** On top of the broader billing question above, Mode A's payment privacy configuration needs at least one rail where a credit top up does not bind to a legal identity. Crypto is the obvious answer. The harder questions are which specific rails, what residual leakage remains at the payment step, and what compliance posture the collective takes (KYC thresholds, jurisdictions, treasury policy). *Closed: not applicable. Recorded in the "Decision" section as part of the conditions for any future Mode A.*
+
+9. **Pricing levels.** Given prepaid credits are the preferred shape across modes: what is the Mode A margin on provider tokens, and what is the Mode B per call (or per token) proxy fee? What sustains the project without pricing out the users for whom privacy is the point or skewing incentives away from local-first? And: a single credit wallet that funds either mode, or two separate balances? *Closed: not applicable. The pricing mechanics were design-time sketching; they did not need to be settled because the project they were sketched for is being declined.*
+
+10. **Provider terms of service.** Several providers have opinions about proxying and shared keys in their terms. We need a clean reading per provider and a position for cases where the proxy might violate TOS. We do not ship a project the collective cannot defend in the open. *Closed by the review-time research pass on Anthropic's Commercial Terms (D.4) and the equivalent posture at other frontier providers. Recorded in the "Decision" section.*
+
+11. **Abuse handling under no retention.** Aggregated keys are abuse magnets. How do we detect and stop abuse without becoming a surveillance layer? Possible answers: hard rate limits, automated classification with no human review, opt in moderation that the user controls. None of these are perfect. *Closed: not applicable.*
+
+12. **Self host parity.** Is the hosted instance functionally identical to the self host bundle, or do some features (shared key pools) only make sense hosted? The closer to identical, the stronger the openness claim. *Closed: not applicable.*
+
+13. **Interaction with other collective projects.** Does Nanocoder route cloud calls through this proxy by default? The proxy is most valuable when the rest of the collective's tooling can opt in cleanly. *Closed: not applicable. If a future smaller proposal exists, the answer is "opt in, not default, until the proxy is stable" — recorded in the design history above.*
+
+14. **Failure mode honesty.** If the proxy goes down, what is the user's path? A degraded direct call with their key (Mode B style) is a privacy regression. Documenting the failure modes is part of the contract. *Closed: not applicable. The failure mode question is the kind of thing a future proposal of any proxy-shaped project should land in its own graduation checklist.*
+
+## Resolved in review
+
+These questions were open when the whitepaper was published and were settled during the public review window. They are recorded here as the design history.
+
+1. **Intended audience.** Settled: primary audience is **developers building LLM features into apps that handle sensitive user data**; secondary audience is **developers who simply care about privacy** and want a purpose-built relay in front of cloud LLM calls. The two-audience shape keeps v1 sized for the primary user (a real pain, a willing-to-pay posture, a self-host case when their own users require it) while letting the installable shape and default Mode B posture serve the secondary without extra design work. Audiences the project does not serve in v1 (activists/journalists/dissidents behind a confidential-compute milestone, formal compliance customers who would require NC to restructure) are named explicitly in the section. See "Intended audience" above.
+
+## Decision: proposed as not viable
+
+This whitepaper is published with the proposer's recommendation that the collective decline the project as currently scoped. The reasoning is recorded here so the work is preserved as a design history and so the conditions under which a future proposal could revisit the same ground are explicit on the page. The recommendation is a proposal to the collective, not a decision; reviewers are expected to weigh in before the review window closes.
+
+The recommendation was reached inside the 30-day public review window, in response to feedback that pushed on three structural points the whitepaper had not honestly resolved.
+
+**Mode A as designed is not shippable under current provider terms and the collective's legal posture.** Mode A holds provider keys at the collective and routes many users through them. Anthropic's Commercial Terms (D.4) require explicit approval to resell the Services, and the equivalent posture holds at other frontier providers. A deal is not technically impossible — OpenRouter has it — but it is a commercial-relationship problem rather than a technical one, and the collective has no legal entity, no provider relationships, and no realistic path to securing them in a v1 timeframe. A "curated provider set" alternative (LiteLLM-shaped: Mode A on top of redistribution-friendly providers only) was considered and is technically possible, but it narrows the value proposition to roughly "OpenRouter with an NC badge," in a market already served by better-resourced projects (OpenRouter, LiteLLM, Portkey, others). That is not a v1 commitment the collective should take on.
+
+**Mode B on its own does not earn a standalone project.** Once Mode A is set aside, the v1 product reduces to Mode B. Mode B hides the user's IP, normalises the request fingerprint, isolates the provider key from the user's own environment, and provides the natural insertion point for the Prompt Scrubber. A VPN in front of a direct call covers most of the IP and fingerprint surface. The remaining Mode B advantages (purpose-built provider routing, scrubber composition point, no-retention default, open-source auditability) are real but small, and the cost of running a hosted proxy for a feature set most users can replicate with a VPN subscription is hard to justify. The "why not a VPN" question is hardest to answer for the secondary audience ("developers who just care about privacy") and the proxy does not have a strong answer for them.
+
+**The privacy story that justifies a project lives at the scrubber, not the proxy.** The strongest stack the proxy was designed to host was always "scrubber plus proxy, composed." On inspection, the scrubber is the load-bearing piece: it addresses identity in the prompt content itself, which a network-layer proxy structurally cannot. Shipping the scrubber as a standalone project delivers most of the privacy value the proxy was meant to add, at a fraction of the operational cost, without the trust posture, the TOS exposure, or the legal-entity question that a network-side proxy carries. The proxy-shaped composition point can still be useful, but as a small relay for users who specifically want it, not as a standalone NC project.
+
+**Where the project would have to land to be viable.** A project at this shape becomes viable when, together: a frontier-lab relationship the collective can win, or a curated set of redistribution-friendly providers worth building a Mode A aggregator on top of; a confidential-compute path that changes Mode A's trust story from "trust us" to "verify the binary"; and a clear answer to the legal-entity question that the proxy's billing posture requires. None of these are within v1 reach today. Any one of them landing would justify a new whitepaper that revisits this ground on its merits rather than as a stale phase-2 promise.
+
+**What is happening instead.** The [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) whitepaper continues separately. The scrubber is the part of the privacy stack this whitepaper reached for, and the part that earns its keep on its own. If a future need surfaces for a relay sitting in front of provider calls — say, a use case where the scrubber-plus-proxy composition is load-bearing for a real user — the smaller, honest shape of Mode B plus scrubber composition is a viable starting point; it would not need this whitepaper's scope to build, and it does not need to be a collective project rather than a community utility.
+
+## Review path
+
+For this proposal to be resolved at the end of the public review window:
+
+- [x] Pick the intended audience. Settled: primary audience is developers building LLM features into apps that handle sensitive user data; secondary is privacy-valuing developers in general. See "Intended audience" and resolved item 1.
+- [x] Reach a recommendation on the project's viability. Proposer's recommendation: **decline as currently scoped**. Reasoning recorded in the "Decision" section above. This is a proposal to the collective, not a final decision; reviewers may push back, in which case the recommendation is revisited.
+- [ ] Reviewers weigh in before the review window closes (2026-06-18). Issues raised against the docs repo during the window are the right place to argue the recommendation.
+- [ ] The core team makes a build / decline / iterate decision at the end of the window, recorded on this page.
+
+If the core team's decision is **decline**, this page stays in place as the historical record of how the design was argued, the frontmatter status moves to `Declined` with a `status_changed_on` date, and the daily archive workflow removes the file from the docs repo after the archive window elapses (git history is the archive).
+
+If the core team's decision is **iterate**, the whitepaper returns to public review with the resolved points applied and the open points re-scoped.
+
+If the core team's decision is **build**, the whitepaper's open questions and graduation checklist are addressed as a precondition, the frontmatter status moves to `Build approved`, and the [Creating a New Project](/collective/projects/creating-a-new-project) playbook takes over.

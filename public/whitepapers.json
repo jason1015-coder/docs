@@ -1,0 +1,72 @@
+{
+  "generated_at": "2026-07-03T07:33:38.705Z",
+  "count": 6,
+  "whitepapers": [
+    {
+      "slug": "private-inference-proxy",
+      "title": "Private Inference Proxy",
+      "description": "A working whitepaper for an open source proxy that lets users call cloud LLM providers with stronger privacy properties than a direct call. The proposer recommends the project be declined as currently scoped; reasoning is recorded in the Decision section.",
+      "proposer": "Will Lamerton",
+      "proposer_github": "will-lamerton",
+      "status": "Paused",
+      "review_opens": "2026-05-19",
+      "review_closes": "2026-06-18",
+      "sidebar_order": 1
+    },
+    {
+      "slug": "prompt-scrubber",
+      "title": "prompt-scrub",
+      "description": "A working whitepaper for a small open source tool that scrubs identifying content from LLM prompts and messages before they leave the user's machine",
+      "proposer": "Will Lamerton",
+      "proposer_github": "will-lamerton",
+      "status": "Building",
+      "review_opens": "2026-05-19",
+      "review_closes": "2026-06-18",
+      "sidebar_order": 2
+    },
+    {
+      "slug": "nano-os",
+      "title": "NanoOS",
+      "description": "A whitepaper for an open source agent orchestration CLI that lets a user compose an oracle agent, specialist sub-agents, skill packs, and custom tools into a personal operating system of agents",
+      "proposer": "Will Lamerton",
+      "proposer_github": "will-lamerton",
+      "status": "Paused",
+      "review_opens": "2026-05-20",
+      "review_closes": "2026-07-01",
+      "sidebar_order": 3
+    },
+    {
+      "slug": "sentinel",
+      "title": "Sentinel",
+      "description": "A working whitepaper for an installable Nanocoder driven workflow that runs security and code audits across a GitHub organisation's repositories, with configurable rule packs and automatic issue filing",
+      "proposer": "Will Lamerton",
+      "proposer_github": "will-lamerton",
+      "status": "Build Approved",
+      "review_opens": "2026-05-22",
+      "review_closes": "2026-06-21",
+      "sidebar_order": 4
+    },
+    {
+      "slug": "docs-forest",
+      "title": "DocsForest",
+      "description": "A working whitepaper for a Nanocoder driven workflow that runs weekly across the collective's repositories, checks the documentation in each repo against the actual functionality, and raises an issue on the repo when the two have drifted",
+      "proposer": "Will Lamerton",
+      "proposer_github": "will-lamerton",
+      "status": "Build Approved",
+      "review_opens": "2026-05-22",
+      "review_closes": "2026-06-21",
+      "sidebar_order": 5
+    },
+    {
+      "slug": "marketplace",
+      "title": "Marketplace (working title)",
+      "description": "A working whitepaper for an open, harness-agnostic marketplace and packaging format for agent assets (skills, tools, prompts, sub-agents) that can be installed into any agent harness without rewriting",
+      "proposer": "Matt Spence",
+      "proposer_github": "mrspence",
+      "status": "In public review",
+      "review_opens": "2026-05-27",
+      "review_closes": "2026-07-01",
+      "sidebar_order": 6
+    }
+  ]
+}

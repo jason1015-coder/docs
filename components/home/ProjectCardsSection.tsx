@@ -1,15 +1,6 @@
-import { ArrowRight, BookOpen } from "lucide-react";
 import Link from "next/link";
 
 import { getApps, getLibraries } from "@/lib/projects";
-import { Button } from "../ui/button";
-
-const projectGradients: Record<string, string> = {
-  nanocoder: "from-[#7aa2f7] to-[#bb9af7]",
-  nanotune: "from-[#7dcfff] to-[#9ece6a]",
-  "get-md": "from-[#565f89] to-[#414868]",
-  "json-up": "from-[#ff9e64] to-[#f7768e]",
-};
 
 function ProjectCard({
   project,
@@ -19,70 +10,54 @@ function ProjectCard({
   variant?: "default" | "compact";
 }) {
   const isProject = variant === "default";
-  const gradient = projectGradients[project.id] || "from-gray-600 to-gray-500";
+  const tag = isProject ? "[ app ]" : "[ pkg ]";
+
+  const exploreHref = isProject
+    ? `https://nanocollective.org/${project.id}`
+    : `https://github.com/Nano-Collective/${project.id}`;
+
+  const exploreText = isProject ? `Explore ${project.name}` : `View on GitHub`;
 
   return (
-    <div className="group overflow-hidden rounded-xl bg-card border border-border/50 hover:border-border transition-colors">
-      {isProject ? (
-        /* Project card with gradient hero */
-        <div className="flex flex-col sm:flex-row">
-          <div
-            className={`w-full sm:w-1/2 min-h-[180px] bg-gradient-to-br ${gradient} flex flex-col items-center justify-center p-8 relative overflow-hidden`}
+    <div className="bg-background border border-foreground/20 p-8 group hover:bg-muted transition-all hover:shadow-lg dark:hover:shadow-[0_4px_20px_rgb(0,0,0,0.5)] hover:-translate-y-1 flex flex-col h-full relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 dark:opacity-100 pointer-events-none" />
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <span className="font-mono text-xs sm:text-sm font-bold text-[#0000EE] dark:text-[#A1A1AA]">
+              {tag}
+            </span>
+            <h3 className="text-2xl md:text-3xl font-bold tracking-tight">
+              {project.name}
+            </h3>
+          </div>
+        </div>
+        <p className="text-sm sm:text-lg text-foreground/70 leading-relaxed mb-8 flex-grow">
+          {project.description}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link
+            href={`/${project.id}/docs`}
+            className="inline-flex h-12 items-center justify-center bg-[#0000EE] dark:bg-foreground px-8 text-sm font-semibold tracking-wide text-white dark:text-background transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground w-full sm:w-auto group/btn"
           >
-            <div className="absolute inset-0 opacity-30" />
-            <div className="relative z-10 text-center">
-              <h3 className="text-2xl font-bold text-white">{project.name}</h3>
-            </div>
-          </div>
-          <div className="flex flex-col gap-4 w-full sm:w-1/2 p-8 bg-card">
-            <p className="text-muted-foreground text-lg">
-              {project.description}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 mt-auto">
-              <Button asChild className="group/btn w-full sm:w-auto">
-                <Link href={`/${project.id}/docs`}>
-                  View Docs
-                  <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover/btn:translate-x-1" />
-                </Link>
-              </Button>
-              <Button asChild variant="secondary" className="w-full sm:w-auto">
-                <Link href={`/${project.id}`}>Home</Link>
-              </Button>
-            </div>
-          </div>
+            <span className="mr-3 font-bold text-white dark:text-background transition-colors">
+              &gt;
+            </span>
+            View Docs
+          </Link>
+          <a
+            href={exploreHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-12 items-center justify-center border border-foreground/20 bg-transparent px-8 text-sm font-semibold tracking-wide text-foreground transition-colors hover:border-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black w-full sm:w-auto group/btn"
+          >
+            <span className="mr-3 font-bold text-[#0000EE] dark:text-[#A1A1AA] transition-colors">
+              &gt;
+            </span>
+            {exploreText}
+          </a>
         </div>
-      ) : (
-        /* Library card - compact style */
-        <div className="p-6 flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <div
-              className={`w-10 h-10 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center`}
-            >
-              <BookOpen className="w-5 h-5 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold">{project.name}</h3>
-          </div>
-          <p className="text-muted-foreground text-sm">{project.description}</p>
-          <div className="flex flex-col sm:flex-row gap-3 mt-auto">
-            <Button
-              asChild
-              variant="default"
-              size="sm"
-              className="w-full sm:w-auto"
-            >
-              <Link href={`/${project.id}/docs`}>Docs</Link>
-            </Button>
-            <Button
-              asChild
-              variant="secondary"
-              size="sm"
-              className="w-full sm:w-auto"
-            >
-              <Link href={`/${project.id}`}>Home</Link>
-            </Button>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -97,10 +72,12 @@ export function ProjectCardsSection() {
         {/* Projects Section */}
         {apps.length > 0 && (
           <>
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-3">Nano Projects</h2>
-              <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-                Full-fledged applications to boost your development workflow
+            <div className="mb-8 sm:mb-16 border-b border-foreground/20 pb-4 sm:pb-8">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
+                Nano Projects
+              </h2>
+              <p className="text-xs sm:text-lg text-foreground/70 font-mono">
+                Full-fledged applications to boost your development workflow.
               </p>
             </div>
             <div className="flex flex-col gap-6 mb-16">
@@ -118,10 +95,12 @@ export function ProjectCardsSection() {
         {/* Libraries Section */}
         {libraries.length > 0 && (
           <>
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-3">Nano Libraries</h2>
-              <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-                Lightweight utilities to integrate into your projects
+            <div className="mb-8 sm:mb-16 border-b border-foreground/20 pb-4 sm:pb-8">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
+                Nano Libraries
+              </h2>
+              <p className="text-xs sm:text-lg text-foreground/70 font-mono">
+                Lightweight utilities to integrate into your projects.
               </p>
             </div>
             <div className="grid gap-6 sm:grid-cols-2">

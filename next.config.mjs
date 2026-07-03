@@ -1,11 +1,10 @@
-import type { NextConfig } from "next";
 import nextra from "nextra";
 
 const withNextra = nextra({
   defaultShowCopyCode: true,
 });
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   ...(process.env.NODE_ENV === "production" && { output: "export" }),
   images: {
     unoptimized: true,

@@ -1,10 +1,15 @@
 ---
-title: "Sentinel (working title)"
+title: "Sentinel"
 description: "A working whitepaper for an installable Nanocoder driven workflow that runs security and code audits across a GitHub organisation's repositories, with configurable rule packs and automatic issue filing"
 sidebar_order: 4
+proposer: "Will Lamerton"
+proposer_github: "will-lamerton"
+status: "Build Approved"
+review_opens: "2026-05-22"
+review_closes: "2026-06-21"
 ---
 
-# Sentinel (working title)
+# Sentinel
 
 Most organisations on GitHub have more repositories than they have eyes to keep on them. Static analysis runs catch a fraction of what matters. Paid security platforms catch more, but they cost a lot, sit behind closed source, and tend to flatten every ecosystem into the same generic ruleset. A Solana program, a TypeScript web app, and a Rust CLI all get the same audit, which is rarely the audit any of them actually needs.
 
@@ -12,7 +17,7 @@ This whitepaper proposes a project that fills the gap with a Nanocoder driven wo
 
 ContentForest is the closest sibling. The shape is the same: a daily GitHub Action runs Nanocoder against a templated prompt, validates the output, and writes the result somewhere a human can act on it. The differences are who installs it (any organisation, not just the collective), where the output lands (issues on the audited repo, not PRs in the workflow's own repo), and what the prompts encode (security rules, not release content).
 
-The document is published in working form so the collective can argue the shape of it before code lands. Naming, scope, and design decisions below are open.
+The document is published in working form so the collective can argue the shape of it before code lands. Naming, scope, and design decisions below were open when the whitepaper merged and have been settled during the public review window (recorded under "Resolved in review" at the bottom of this page).
 
 ## Problem
 
@@ -49,7 +54,7 @@ The work that remains is choosing where to point the documentation and the worke
 
 The three values that govern every Nano Collective project apply, with two carrying particular weight for this project:
 
-- **Privacy respecting.** Sentinel reads source code, which is often sensitive. The default deployment must keep that code on infrastructure the organisation controls (their own GitHub Actions runners, their own configured model endpoint). Where a cloud model is used, the project must be honest about exactly which code is sent where, and must compose cleanly with the sibling [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) and [Private Inference Proxy](/collective/whitepapers/private-inference-proxy) projects.
+- **Privacy respecting.** Sentinel reads source code, which is often sensitive. The default deployment is honest about exactly which code is sent where. On a GitHub hosted runner calling a configured cloud model endpoint, the audited code leaves the runner and goes to the configured endpoint; that path is explicit configuration, never hidden behaviour. Local models on a self hosted runner keep every byte on hardware the operator owns. The configured endpoint is operator-chosen; an operator who needs pre-send scrubbing composes the workflow with whatever content-layer tool fits their threat model.
 - **Local first.** Audit work is one of the workloads where users are most exposed if they reach reflexively for a cloud model. Sentinel must make local Nanocoder providers (Ollama, LM Studio, llama.cpp, MLX) a first class path. Cloud is allowed where capability requires it, and must be opt in rather than the default.
 - **Open for all.** Full source open. The rule pack format documented in enough detail that anyone can write a pack for the patterns they care about. Anyone can install Sentinel on their own organisation. Anyone can publish a community pack.
 
@@ -57,7 +62,7 @@ A fourth principle, specific to this project, is worth naming:
 
 - **Honest about false positives.** Any LLM driven audit tool produces both false positives and false negatives. A tool that pretends otherwise trains its users to either click through every finding or stop reading them. Sentinel must surface its confidence honestly, provide a clear path for marking findings as accepted or dismissed, and avoid filing the same noisy issue twice.
 
-## Threat model (open)
+## Threat model
 
 A continuous security audit tool is itself a security surface. Naming what it does and does not defend against, to be argued:
 
@@ -177,7 +182,7 @@ A scheduled run flows like this:
 6. For each finding that meets the severity threshold and is not already filed, the workflow opens an issue on the target repo. Findings that match an existing issue update its last seen timestamp.
 7. A run summary lands in the configuration repo, with cross repo metrics aggregated for the maintainer.
 
-This is not novel. The novel parts are the locality of the model layer, the openness of the rule packs, and the installability of the whole thing into any organisation. The substrate is the same whether the model is a local Llama running on the organisation's own runner, or a cloud model called through the [Private Inference Proxy](/collective/whitepapers/private-inference-proxy) with the [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) in front of it.
+This is not novel. The novel parts are the locality of the model layer, the openness of the rule packs, and the installability of the whole thing into any organisation. The substrate is the same whether the model is a local Llama running on the organisation's own runner, or a cloud model on a configured endpoint.
 
 ## A worked example: a Solana shop
 
@@ -194,7 +199,7 @@ The organisation runs `npx @nanocollective/sentinel init` in a fresh repo in the
   - The front end repo gets a `web-frontend` pack.
 - **Schedule.** Daily at 06:00 UTC.
 - **Severity threshold.** Medium and above file issues automatically. Low findings appear in the run summary but do not file.
-- **Model configuration.** Local Ollama running on a self hosted runner, fronted by a small Llama variant for the cheaper passes and a larger model for the audit prompt itself. Cloud is configured as a fallback through the proxy, for cases where the local model demonstrably struggles.
+- **Model configuration.** Local Ollama running on a self hosted runner, fronted by a small Llama variant for the cheaper passes and a larger model for the audit prompt itself. Cloud is configured as a fallback to a configured cloud endpoint, for cases where the local model demonstrably struggles.
 
 The team wrote each of these packs themselves over a few weeks, using the published pack format documentation and the example pack NC publishes from one of its own audited repos as a starting point. Some patterns came straight from their own code review checklists; some came from public guidance the team had bookmarked over the years. Every pack lives in the configuration repo, versioned in Git like any other internal document. None of them is something NC ships or maintains.
 
@@ -228,7 +233,7 @@ A deliberately narrow v1, shipped well.
 - **Rule pack authoring documentation.** The pack format published as a stable v1, alongside guidance on writing a good pack: severity language, false positive suppression patterns, examples of what works and what does not.
 - **A scheduled GitHub Actions workflow.** Daily by default. PR triggered runs deferred to phase 2 unless the design naturally accommodates them.
 - **Issue filing with dedup.** Content hashed findings, no duplicate issues, `false-positive` closes respected.
-- **Local model first.** Nanocoder configured for local providers as the default. Cloud documented and supported, explicitly opt in.
+- **Local model first on a self hosted runner is the fully supported first class path.** GitHub hosted runners with a configured cloud model endpoint are the out of the box default for installs that do not stand up a self hosted runner. The configured cloud endpoint is operator-chosen; the project ships no model recommendation.
 
 What v1 ships is "a workflow, a configuration shape, a stable rule pack format, and documentation on how to author packs." Not a full security platform. Not a pack catalogue. The starting point that grows, with the rule pack maintenance burden left where it belongs (with the people who own the code being audited).
 
@@ -249,8 +254,6 @@ What v1 ships is "a workflow, a configuration shape, a stable rule pack format, 
 Most collective projects compose with Sentinel through plain configuration. A few have a more specific integration shape worth naming:
 
 - **[Nanocoder](https://github.com/Nano-Collective/nanocoder)** is the runtime under every audit pass. The workflow runs Nanocoder in non interactive mode against a templated prompt, the same shape ContentForest already uses.
-- **The [Prompt Scrubber](/collective/whitepapers/prompt-scrubber)** runs as middleware on any audit pass that uses a cloud model. Source code paths, internal identifiers, and any incidental secrets in the code are scrubbed before the prompt goes out.
-- **The [Private Inference Proxy](/collective/whitepapers/private-inference-proxy)** is the configured network path for cloud model calls. Sentinel never calls a cloud provider directly when the proxy is configured.
 - **[NanoOS](/collective/whitepapers/nano-os)**, if and when it lands, is a natural place from which to invoke Sentinel runs as a sub agent. An organisation's oracle could be asked "what is the security posture of our repos this week" and delegate to a Sentinel run on demand, in addition to the scheduled passes.
 
 This is the long picture from the collective's introduction page expressed as another product on the same stack: local first models, ecosystem specific rule packs anyone can write, and privacy preserving paths to external capability when the task genuinely requires it. Sentinel is the security shaped instance of the same pattern ContentForest demonstrates for release content.
@@ -286,40 +289,43 @@ These are the concerns that could kill the project or force it into a different 
 
 9. **Hosting model dictates trust.** If the user accepts the GitHub App alternative later, they accept NC into their trust path. The current shape keeps NC out of the trust path entirely, which is the right v1 posture but limits some ergonomic gains.
 
+## Resolved in review
+
+These questions were open when the whitepaper was published and were settled during the public review window. They are recorded here as the design history.
+
+1. **Naming.** Settled: **Sentinel**. The working title becomes the name. Clean noun shape, no collision with existing collective projects, the package convention (`@nanocollective/sentinel`) follows the existing pattern. Dropped "(working title)" from the frontmatter and the H1.
+2. **Severity model.** Settled: **low / medium / high / critical**, with a separate `confidence` value and a `category`. A deliberate four-tier scale, distinguishing docs-forest's three-tier model. The fourth tier above high is justified for security work, where the consequence of confusing a "high" (notable pattern) with a "critical" (missing signer check, leaked production credential) is asymmetric. CVSS-style numeric scoring is rejected as overkill for an LLM-driven tool.
+3. **Installable shape.** Settled: **internal NC use case is the primary v1 target; the installable shape ships day-one alongside it**, mirroring docs-forest. The collective is the first user (and first design partner for the rule packs), and `npx @nanocollective/sentinel init` is available to any GitHub org from v1.
+4. **First run behaviour.** Settled: **files all qualifying issues at once** on the first run, identical to every later run. No summary-only first pass, no per-repo staging. Simplicity wins. A noisy first run is the maintainer's calibration signal, not a bug.
+5. **Dedup and suppression.** Settled: **layered**. Content-hash dedup is the floor (rule pack, file, line range, finding type). Per-finding labels (`sentinel:false-positive`, `sentinel:accepted`, `sentinel:wontfix`) handle one-off dismissals. A per-repo `sentinel.yaml` config file is the opt-in escape hatch for systematic noise. Three escape hatches in increasing specificity.
+6. **PR-triggered runs.** Settled: **scheduled runs only in v1.** PR-triggered runs (with the comment / check-run / race-condition complexity) are deferred to phase 2. The v1 finding output is consumable by a future PR-triggered surface without reshaping.
+7. **Stack.** Settled: **TypeScript**, matching `get-md`, `json-up`, `contentforest`, and `docsforest`. The case for Rust or Go is a phase 2 trigger (a real performance constraint), not a v1 design choice. Architecture is documented to allow a Rust detection core behind the same JS API if the budget demands it.
+8. **Relationship to ContentForest.** Settled: **stay separate for now**. Sentinel and ContentForest share the orchestration shape (cron, Nanocoder, prompt, validator, structured output, dedup'd downstream action) but remain independent projects on independent release cadences. No shared "forest framework" library. The only shared code is the kind of tiny standalone utility (`get-md`, `json-up`) NC already publishes.
+9. **Rule pack manifest format.** Settled: **one file per pack, YAML manifest header + markdown body.** Fields: `name`, `version`, `applies_to` (path globs and language identifiers), `severity_weighting`, `depends_on` (other packs), `category`. The markdown body is the audit prompt. A pack is a single file, easy to install, easy to diff, easy to lift into a community pack repo. NC also publishes a small set of example packs from its own internal audits, clearly marked as illustrative, the same posture docs-forest takes for its published audit prompt.
+10. **Activation aids / starter pack.** Settled: **yes, scaffold a starter pack template.** The `init` command writes a `rule-packs/_starter/` directory with one example pack demonstrating every manifest field, clearly marked as illustrative, and **not auto-enabled**. The user has to explicitly opt in by removing the `_` prefix (or copying it to a real path) to make Sentinel use it. The underscore-prefix convention is a clear visual signal that the file is template content.
+11. **Configuration shape + issue routing.** Settled: **single configuration per install.** One `sentinel.yaml`, one workflow, one schedule. Repo groups are modelled by the `targets:` list (patterns, owner/org slugs, or named lists) combined with `applies_to` on each rule pack. Issue routing default is **all findings on the audited repo**; an opt-in `aggregate_to_config_repo: true` flag routes everything to the config repo instead. Multi-config is phase 2.
+12. **Runner and model posture.** Settled: **GitHub hosted runner (`ubuntu-latest`) + configured cloud model endpoint**. The Prompt Scrubber and Private Inference Proxy are separate projects and are not part of Sentinel's v1 composition story; the v1 posture is "operator-chosen configured cloud endpoint, with full local support on self-hosted runners." The principles, threat model, and worked example were rewritten to state this honestly rather than claim the material never leaves the runner. The Privacy respecting principle is rewritten to lead with the honest statement that on a hosted runner calling a configured cloud endpoint, the audited code leaves the runner and goes to the configured endpoint.
+13. **Observability and run history.** Settled: **lightweight static dashboard in the configuration repo's GitHub Pages**, generated from the committed run records. Step summary for the immediate run, full markdown preview in dry-run mode, committed run record per run as the durable store, dashboard as the read-side surface. No database.
+14. **Package shape / locally runnable.** Settled: **locally runnable in v1.** The same package is runnable via `npx @nanocollective/sentinel run --rule-pack <path> --repo <path> --output <path>` for off-cycle audits. Same code path, same validator, same dedup logic. Writes findings to a local markdown file by default; does not file issues (issue filing requires a GitHub token, only available in the Actions path). The local run is the calibration path for pack authors iterating on a pack.
+15. **Door open for auto-fix PRs.** Settled: **yes, leave the door open in the v1 design.** Findings carry `file`, `line_range`, `category`, `severity`, `confidence`, `rule`, `offending_snippet`. v1 does not open PRs, but the structure is rich enough that a phase 2 auto-fix surface consumes the output without a data-model migration.
+16. **Run modes.** Settled: **live (default) and dry-run both ship in v1.** Live files issues; dry-run does the full audit but files nothing, rendering the candidate findings as a markdown preview grouped into "would file as new" / "dedup would have matched" / "below severity threshold," written to the Actions step summary and a run artefact. Dry-run is the calibration path for both new packs and new installs tuning the prompt. First live run (per item 4) files immediately, regardless.
+
 ## Open questions
 
-These are the questions the whitepaper exists to argue.
-
-1. **Naming.** "Sentinel" is the working title. It is descriptive, it is short, it does not collide with any existing collective project, and it has a clean noun shape. Alternatives in the "Forest" family ("AuditForest", "SecurityForest") would emphasise the ContentForest sibling relationship. Alternatives in the lowercase hyphenated utility family ("code-sentinel", "nanosentry") would emphasise the package shape. Worth resolving early.
-2. **NC's own published packs.** The collective will write internal packs for its own audited repos. Some subset of those could be published alongside the documentation as worked examples, both to make pack authoring concrete for new users and to surface useful patterns. Which packs to publish, how to scope them, and how clearly to mark them as "examples, not maintained for general use" is open.
-3. **PR triggered runs in v1.** Scheduled runs are simpler and the right default. PR triggered runs are higher value but add complexity (rate limiting, comment vs check vs issue, race conditions on closing PRs with open findings). Whether to ship PR triggered runs in v1 or as phase 2 is open.
-4. **Issue routing.** All findings on the audited repo (default) versus aggregated into the configuration repo (option) versus both. The default matters more than the option, since most installs will accept the default.
-5. **Severity model.** A simple low/medium/high/critical scale, or finer grained. CVSS style scoring is overkill for an LLM driven tool; "the rule pack author's intuition, plus a confidence value, plus a category" is probably the right shape. To be argued.
-6. **Rule pack manifest format.** A markdown body plus a small YAML or JSON header is the obvious shape. The exact fields (applies to, depends on, version, severity weighting) need to be designed in their own right rather than borrowed wholesale. Cross project alignment with the [NanoOS](/collective/whitepapers/nano-os) skill manifest is a nice to have, not a requirement; the two are aimed at different jobs.
-7. **Activation aids.** The empty out of the box state is a real risk. Whether the `init` command also generates a starter pack template (the manifest, an empty markdown body with the section headings filled in, a few comments pointing to the docs) is open. The line between "scaffold that helps" and "default pack we are now on the hook to maintain" is the design question.
-8. **Per finding suppression.** A `false-positive` close on an issue is the obvious suppression signal. A repo level config file that suppresses specific finding shapes is a richer option. Whether to ship the file format in v1 is open.
-9. **Configuration shape.** A single configuration repo per installing organisation, holding everything. Whether to support multiple named configurations (different schedules for different repo groups) in v1 or later. Default is single configuration; complexity is opt in.
-10. **First run behaviour.** Whether the first run on a new install files issues immediately, files a summary only, or stages findings one repo at a time. This is a real product decision; the install experience hinges on it.
-11. **Cloud model defaults.** The local first principle says local by default. Audit work involves models reasoning over potentially large codebases, which strains local hardware. Whether the project ships with a recommended local model floor, a recommended cloud fallback, or neither, is open.
-12. **Self hosted runners.** Whether the project assumes self hosted runners are available (the right answer for sensitive private repos) or works acceptably on standard GitHub hosted runners. Documentation has to address both.
-13. **Auto fix PRs.** A natural phase 2 surface. Whether to leave the door open in the v1 design (output shape, finding format) is worth arguing now, even if the feature ships later.
-14. **Observability and run history.** A run that produced surprising findings deserves a trace the maintainer can read. What v1 ships for run summaries, per repo history, and cross run comparison is part of the user experience, not a power user feature.
-15. **Stack.** TypeScript follows the rest of the collective and matches ContentForest's choice. A case for a different stack would have to be made explicitly. Default is TS unless argued otherwise.
-16. **The package shape.** v1 plans an npm package as the primary install surface (`npx @nanocollective/sentinel init` to scaffold, same package invoked at run time by the generated workflow). Open: whether the same package binary is also runnable locally for off cycle audits (`npx @nanocollective/sentinel run --rule-pack ... --repo ...`) outside of GitHub Actions, and whether that path is in v1 or phase 2.
-17. **Relationship to ContentForest.** ContentForest and Sentinel share orchestration shape but not jobs. The collective's posture is that they stay as independent projects; no shared "forest framework" library sits underneath them. Sentinel copies what it needs from ContentForest's playbook and evolves on its own cadence. The open part is at the implementation level only: if a small utility (frontmatter parsing, finding hash computation) genuinely makes sense in two places, it can be lifted into a tiny standalone package the way `get-md` and `json-up` already exist as standalone NC utilities.
+All questions raised during the review window have been resolved and recorded above. None remain open at the time of writing. New concerns can still be raised as issues against the docs repo during the review window (it closes 2026-06-21); if a fundamental one surfaces, it gets added here and argued.
 
 ## Next steps
 
 For this whitepaper to graduate into docs:
 
-- [ ] Resolve the naming question.
-- [ ] Lock the rule pack manifest format and document the contract.
-- [ ] Write the pack authoring guide. The empty out of the box state lives or dies on this document.
-- [ ] Decide which of NC's own internal packs (once written) are published alongside the documentation as worked examples, and how clearly they are marked as illustrative rather than maintained.
-- [ ] Decide whether `init` scaffolds a starter pack template alongside the empty `rule-packs/` directory, and what that scaffold looks like.
-- [ ] Decide whether PR triggered runs ship in v1 or phase 2.
-- [ ] Sketch the first run experience in enough detail that the install can be argued, not just stated.
-- [ ] Decide whether the published npm package is also runnable locally for off cycle audits, or stays scoped to the scaffolder plus the workflow runtime.
+- [x] Resolve the naming question. Settled: **Sentinel**. Package shape `@nanocollective/sentinel`, CLI `npx @nanocollective/sentinel init`.
+- [x] Lock the rule pack manifest format and document the contract. Settled: YAML manifest header + markdown body, one file per pack.
+- [x] Write the pack authoring guide. The empty out of the box state lives or dies on this document.
+- [x] Decide which of NC's own internal packs (once written) are published alongside the documentation as worked examples, and how clearly they are marked as illustrative rather than maintained. Settled: a small set is published under a clearly illustrative label.
+- [x] Decide whether `init` scaffolds a starter pack template alongside the empty `rule-packs/` directory, and what that scaffold looks like. Settled: yes, scaffold under `rule-packs/_starter/` with the underscore-prefix convention, not auto-enabled.
+- [x] Decide whether PR triggered runs ship in v1 or phase 2. Settled: scheduled only in v1; PR triggered runs are phase 2.
+- [x] Sketch the first run experience in enough detail that the install can be argued, not just stated. Settled: first live run files all qualifying issues immediately, identical to every later run; the activation story leans on the documented worked-example packs and the underscore-prefixed starter scaffold.
+- [x] Decide whether the published npm package is also runnable locally for off cycle audits, or stays scoped to the scaffolder plus the workflow runtime. Settled: locally runnable in v1 via `npx @nanocollective/sentinel run`; writes findings to a local markdown file, no issue filing outside Actions.
 
 When those are settled, this document becomes the foundation of the project's README and design notes. The repository is created under [`Nano-Collective`](https://github.com/Nano-Collective), and the [Creating a New Project](/collective/projects/creating-a-new-project) playbook takes over.
 

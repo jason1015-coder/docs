@@ -3,6 +3,8 @@ import path from "node:path";
 import { notFound } from "next/navigation";
 import { compileMdx } from "nextra/compile";
 import { evaluate } from "nextra/evaluate";
+import { Suspense } from "react";
+import { getWhitepaperIssueCounts } from "@/lib/whitepapers";
 import { useMDXComponents } from "../../../mdx-components";
 
 interface PageProps {
@@ -64,15 +66,14 @@ export async function generateStaticParams() {
   return collectSlugs(CONTENT_ROOT).map((slug) => ({ slug }));
 }
 
-export default async function CollectivePage({ params }: PageProps) {
-  const { slug } = await params;
+async function CompiledCollectiveSlugContent({
+  slug,
+  found,
+}: {
+  slug: string[];
+  found: { content: string; relPath: string };
+}) {
   const components = useMDXComponents({});
-
-  const found = getCollectiveContent(slug);
-  if (!found) {
-    notFound();
-  }
-
   const compiledSource = await compileMdx(found.content, {
     filePath: `content/collective/${found.relPath}`,
     defaultShowCopyCode: true,
@@ -87,13 +88,41 @@ export default async function CollectivePage({ params }: PageProps) {
 
   const { CollectiveWrapper } = await import("@/components/CollectiveWrapper");
 
+  const isWhitepaperPage = slug[0] === "whitepapers" && slug.length >= 2;
+  const issueCounts = isWhitepaperPage
+    ? getWhitepaperIssueCounts(slug[slug.length - 1])
+    : undefined;
+
   return (
     <CollectiveWrapper
       toc={toc}
       metadata={mdxMetadata || {}}
+      pageSlug={slug.join("/")}
+      issueCounts={issueCounts}
       sourceCode={found.content}
     >
       <MDXContent />
     </CollectiveWrapper>
+  );
+}
+
+export default async function CollectivePage({ params }: PageProps) {
+  const { slug } = await params;
+
+  const found = getCollectiveContent(slug);
+  if (!found) {
+    notFound();
+  }
+
+  return (
+    <Suspense
+      fallback={
+        <div className="p-12 text-center opacity-50 font-mono text-sm uppercase tracking-widest">
+          [ COMPILING_MDX... ]
+        </div>
+      }
+    >
+      <CompiledCollectiveSlugContent slug={slug} found={found} />
+    </Suspense>
   );
 }

@@ -1,28 +1,20 @@
 import type { Metadata } from "next";
-import { Fira_Code, Lora, Poppins } from "next/font/google";
+import { Geist_Mono, Inter } from "next/font/google";
 import { Head } from "nextra/components";
 import { JsonLd } from "@/components/JsonLd";
+import { SectionReveal } from "@/components/ui/motion";
 import "nextra-theme-docs/style.css";
 import "./globals.css";
 
-const poppins = Poppins({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins",
+  variable: "--font-sans",
   display: "swap",
 });
 
-const lora = Lora({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-lora",
-  display: "swap",
-});
-
-const firaCode = Fira_Code({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-fira-code",
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -33,10 +25,12 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
     ],
     apple: "/apple-touch-icon.png",
   },
+  manifest: "/site.webmanifest",
   openGraph: {
     title: "Nano Collective Docs",
     description: "Official documentation for Nano Collective projects",
@@ -47,8 +41,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/og-image.png",
-        width: 1080,
-        height: 1080,
+        width: 1200,
+        height: 750,
         alt: "Nano Collective",
       },
     ],
@@ -71,7 +65,7 @@ export default function RootLayout({
       lang="en"
       dir="ltr"
       suppressHydrationWarning
-      className={`${poppins.variable} ${lora.variable} ${firaCode.variable}`}
+      className={`${inter.variable} ${inter.variable} ${geistMono.variable}`}
     >
       <Head />
       <body className="antialiased">
@@ -88,7 +82,7 @@ export default function RootLayout({
             },
           }}
         />
-        {children}
+        <SectionReveal>{children}</SectionReveal>
       </body>
     </html>
   );
