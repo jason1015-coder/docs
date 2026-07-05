@@ -16,7 +16,7 @@ Unlike existing benchmarks (SWE-bench and its variants), NanoBench is not a data
 
 This is the benchmark the agent benchmarking space does not have. In May 2026, Artificial Analysis launched the first public Coding Agent Index — the first benchmark measuring full agent stacks (model + harness pairs). NanoBench does the same thing, purpose-built for Nanocoder, with the failure taxonomy depth that no existing public benchmark offers.
 
-The project is proposed as a separate repository under the Nano Collective (`Nano-Collective/nanobench`), with Python as the primary language for the evaluation core, Nanocoder as the first and initially only harness, and a maintainer-owned roadmap that starts with a verifiable 5-task proof of concept and scales to a community-governed dataset of 60+ repositories.
+The project is proposed as a separate repository under the Nano Collective (`Nano-Collective/nanobench`), with Python as the primary language for the evaluation core, Nanocoder as the first and initially only harness, and a maintainer-owned roadmap that starts with a verifiable proof of concept and scales to a community-governed dataset through an open contribution pipeline.
 
 ---
 
@@ -325,12 +325,12 @@ The infrastructure handles workspace environments across two distinct strategies
 
 ### CI Integration
 
-NanoBench will provide a GitHub Actions workflow that:
-- Runs `validate_tasks.py` on every PR to the nanobench repo (verifies task schema, reproducibility, and test command validity).
-- Optionally runs a subset of tasks (configurable) against a specified provider/model combination.
-- Posts a summary comment with scores and failure taxonomy to the PR.
+NanoBench ships a continuous integration workflow that:
+- Validates every incoming task against schema, reproducibility, and verification requirements before it enters the dataset.
+- Optionally runs a configurable subset of tasks against a specified provider and model on demand.
+- Posts a score summary and failure taxonomy breakdown as a review comment.
 
-Maintainers can wire this workflow to run against Nanocoder PRs to catch agent regressions before they ship.
+This workflow can be wired directly to Nanocoder releases to catch agent regressions before they ship.
 
 ---
 
@@ -366,34 +366,25 @@ NanoBench is the only infrastructure that can answer either question for Nanocod
 ## 12. Risks and Challenges
 
 ### Dataset Contamination
+**Risk:** An agent solves a task using training memory rather than active reasoning, artificially inflating its score.
 
-**Risk:** An agent solves a task using training memory rather than active reasoning, artificially inflating its evaluation score.
+**Mitigation:** Every task is post-dated beyond relevant model knowledge cutoffs and subjected to automated similarity screening against public code indexes before inclusion. The pinned commit SHA and merge timestamp are stored in every task, making contamination claims auditable and falsifiable.
 
-**Mitigation:** Every task is strictly post-dated (post-2026) and subjected to automated syntactic similarity screening against public code indexes, ensuring all telemetry remains verifiable and auditable.
+### Environment & Dependency Drift
+**Risk:** Conflicting system dependencies or runtime mismatches cause evaluation failures unrelated to the agent's actual performance.
 
-### Repository Maintenance
-
-**Risk:** Conflicting system-level dependencies or runtime mismatches cause evaluation failures unrelated to the agent's logic.
-
-**Mitigation:**The initial baseline standard focuses on interpreted runtimes, while polyglot environments deploy standardized container configurations to isolate dependencies completely.
-
-### Environment Drift
-
-**Risk:** Conflicting system-level dependencies or runtime mismatches cause evaluation failures unrelated to the agent's logic.
-
-**Mitigation:** The initial baseline standard focuses on interpreted runtimes, while polyglot environments deploy standardized container configurations to isolate dependencies completely..
+**Mitigation:** Single-language environments are isolated via lightweight
+configuration. Polyglot environments run inside fully containerized sandboxes, ensuring dependency conflicts never affect evaluation results.
 
 ### Evaluation Cost
+**Risk:** Multi-provider evaluations at scale incur high API costs and hit rate limits.
 
-**Risk:** Multi-provider evaluations at scale incur high commercial API costs and face restrictive network rate limits.
-
-**Mitigation:** The insertion of targeted context boundaries reduces unnecessary file exploration by roughly 70%, while native support for localized open-weight models allows for cost-free baseline verification.
+**Mitigation:** Expert-metadata injection reduces unnecessary file exploration significantly, cutting both cost and run time. Local open-weight models provide a cost-free baseline for comparison.
 
 ### Benchmark Bias
+**Risk:** Tasks curated by one person reflect a narrow domain slice.
 
-**Risk:** Tasks curated by one person reflect that person's domain expertise and may not represent the full range of engineering challenges.
-
-**Mitigation:** The scoring matrix is fully transparent and auditable, serving as a foundational baseline designed to scale via an open-source, community-driven task contribution pipeline.
+**Mitigation:** The repository scoring matrix is fully transparent and auditable. A community contribution pipeline with strict validation gates opens curation to the broader collective over time.
 
 ---
 
@@ -420,22 +411,26 @@ All alternatives inherently compromise evaluation quality, narrow the diagnostic
 
 ## 14. Open Questions
 
-- Orchestration Language (Python vs. TypeScript): Should the evaluation core remain in Python for its robust subprocess and data libraries, or be rewritten in TypeScript to share a native build toolchain with Nanocoder?
+### Orchestration Language
+Should the evaluation core remain in Python for its subprocess and data
+processing strengths, or be rewritten to share a native build toolchain
+with Nanocoder? This affects long-term maintainability and contributor
+onboarding friction.
 
-- **Automated vs. Human Evaluation**: While scoring is strictly automated, should we introduce an optional human-in-the-loop review for "Partial Resolution" tasks to distinguish correct-but-incomplete code from plausible hallucinations?
+### Automated vs. Human Evaluation
+Scoring is fully automated via native test suites. Should an optional
+human-in-the-loop review layer be introduced for partial-resolution tasks,
+to distinguish correct-but-incomplete logic from plausible hallucinations?
 
-- **Community Contribution Gates**: What strict programmatic validation checks (e.g., automated reproducibility tests, contamination screening) must be enforced before accepting community-submitted evaluation tasks?
+### Community Contribution Gates
+What programmatic validation requirements must a community-submitted task
+satisfy before entering the dataset? The bar needs to be high enough to
+protect dataset integrity without being so high it discourages contribution.
 
-- **Long-Term Dataset Governance**: As the dataset scales, what is the formal process for prioritizing new architectural frameworks, retiring outdated telemetry, and resolving scoring disputes?
-
-- **Dependency State Caching**: How do we mitigate heavy CI latency when installing dependencies (npm, pip, go) for every run? Do we use pre-compiled Docker images or a shared CI artifact cache?
-
-- **Semantic Diff Matching**: Because exact string-matching on patches is brittle, what is our standard for evaluating semantic equivalence (e.g., AST-level diffing vs. pure test-suite verification)?
-
-- **Prompt Sanitization**: How aggressively should we scrub historical PR descriptions to prevent leaking the solution without accidentally rendering the task unsolvable?
-
-- **Compute & Token Budgets**: What is the acceptable financial cost ceiling for running complex, multi-step tasks across commercial APIs, and how do we enforce limits without truncating valid agent reasoning?
-
+### Long-Term Dataset Governance
+As the dataset scales, what is the formal process for onboarding new
+architectural domains, retiring outdated tasks, and resolving scoring
+disputes? This is a collective-level decision, not a technical one.
 ---
 
 ## 15. Roadmap [ v1 image ]
