@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Inter } from "next/font/google";
 import { Head } from "nextra/components";
 import { JsonLd } from "@/components/JsonLd";
-import { SectionReveal } from "@/components/ui/motion";
+import { PageTransition } from "@/components/ui/motion";
 import "nextra-theme-docs/style.css";
 import "./globals.css";
 
@@ -82,7 +82,17 @@ export default function RootLayout({
             },
           }}
         />
-        <SectionReveal>{children}</SectionReveal>
+        {/*
+          Fade the page in on mount. This MUST use `animate` (fires on mount
+          regardless of scroll position), not `whileInView`. `SectionReveal`
+          used `whileInView` with `viewport={{ amount: 0.15 }}`, which requires
+          15% of the wrapped element to be visible before it fades in. On a
+          long page (e.g. a whitepaper ~19,000px tall) 15% never fits in the
+          viewport, so the animation never fired and the whole page stayed at
+          opacity:0 — a blank white screen on hard refresh. `PageTransition`
+          animates on mount and is height-independent.
+        */}
+        <PageTransition>{children}</PageTransition>
       </body>
     </html>
   );
