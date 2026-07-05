@@ -16,7 +16,7 @@ Unlike existing benchmarks (SWE-bench and its variants), NanoBench is not a data
 
 This is the benchmark the agent benchmarking space does not have. In May 2026, Artificial Analysis launched the first public Coding Agent Index — the first benchmark measuring full agent stacks (model + harness pairs). NanoBench does the same thing, purpose-built for Nanocoder, with the failure taxonomy depth that no existing public benchmark offers.
 
-The project is proposed as a separate repository under the Nano Collective (`Nano-Collective/nanobench`), with Python as the primary language for the evaluation core, Nanocoder as the first and initially only harness, and a maintainer-owned roadmap that starts with a verifiable 3-task proof of concept and scales to a community-governed dataset of 20+ repositories.
+The project is proposed as a separate repository under the Nano Collective (`Nano-Collective/nanobench`), with Python as the primary language for the evaluation core, Nanocoder as the first and initially only harness, and a maintainer-owned roadmap that starts with a verifiable 5-task proof of concept and scales to a community-governed dataset of 60+ repositories.
 
 ---
 
@@ -32,14 +32,17 @@ NanoBench answers both questions with the same infrastructure: a fixed set of ex
 
 ### Background and Motivation
 
-The core motivation comes from a direct empirical observation. Using a real merged pull request from `google-deepmind/torax` (PR #1895) as a benchmark task, and running it through `mini-swe-agent`, the following happened:
+The core motivation stems from a direct empirical observation of how current agent harnesses handle highly complex, enterprise-grade architectures. When evaluating a real-world, multi-file engineering task—such as a strictly functional data flow refactor in a scientific computing repository (e.g., `google-deepmind/torax`)—standard agents frequently exhibit a fundamental breakdown in codebase reasoning:
 
-- The task required changes to 6-8 files. The agent read **34 files** before exhausting its API quota.
-- The agent edited only **2 files** — both surface-level changes — without understanding that its edits broke the JAX functional data flow.
-- The agent hallucinated a `.get_contributions()` method that does not exist in the QLKNN class, failing to understand that JAX functional programming requires explicit value threading rather than imperative attribute mutation.
-- The run produced a `RateLimitError` on its 32nd API call, consuming 215,400 tokens on a task that needed targeted, architecture-aware edits.
+- `Context Explosion`: Reading dozens of irrelevant files instead of isolating the exact components needed for the fix.
 
-The result was `test_status: FAILED`. The failure was not a scoring edge case — it was a fundamental breakdown in codebase reasoning that existing benchmarks cannot capture because their tasks are too simple to expose it.
+- `Architectural Blindness`: Making surface-level edits that completely break underlying system paradigms (like mutating variables in a strictly functional codebase).
+
+- `API Hallucination`: When faced with complex or unfamiliar abstractions, agents frequently hallucinate non-existent methods rather than successfully navigating the actual class hierarchy.
+
+- `Resource Exhaustion`: This undirected search strategy results in massive token consumption and rate-limit failures long before a meaningful solution is formulated.
+
+When an agent fails a task of this complexity on a standard benchmark, the output is simply a binary FAILED. There is zero diagnostic signal explaining why the agent failed—whether it was a hallucinated API, an exceeded context window, or an abstraction mismatch. Existing benchmarks cannot capture these nuances because their tasks are too simple to expose them
 
 This is the gap NanoBench fills.
 
@@ -49,7 +52,7 @@ This is the gap NanoBench fills.
 
 ### Limitations of Existing Benchmarks
 
-The agent benchmarking space has a saturation problem. SWE-bench, which became the de facto evaluation standard for coding agents, has driven rapid progress — but that progress has exposed its structural limitations:
+The agent benchmarking space is saturated and structurally limited. While current standards have driven rapid progress, they fail to test real-world engineering constraints. Existing benchmarks suffer from five core flaws:
 
 - **Single-language bias**: the majority of SWE-bench tasks are Python-only, with no polyglot engineering tasks.
 - **Overly localized fixes**: most tasks require changes to 1-2 files. Real engineering problems span architectural layers.
@@ -57,7 +60,7 @@ The agent benchmarking space has a saturation problem. SWE-bench, which became t
 - **Contamination**: a significant portion of resolved issues were incorrectly marked as resolved due to weak test cases that did not verify patch correctness. When properly filtered, resolution rates drop from ~42% to ~22% on average.
 - **Data contamination**: most tasks predate significant LLM knowledge cutoffs, meaning agents can solve them from memory rather than reasoning.
 
-Newer variants (SWE-bench Pro, SWE-bench Verified, Multi-SWE-bench) address subsets of these concerns, but none address all of them, and none are designed to evaluate a specific agent harness across multiple model providers.
+While newer benchmark variants attempt to patch these individual issues, none of them solve the core problem: there is currently no benchmark designed to evaluate a specific agent harness across multiple model providers.
 
 ### The Gap in Real-World Agent Evaluation
 
@@ -88,7 +91,7 @@ This is a first-class Nanocoder CLI invocation. Any provider that Nanocoder supp
 
 ### Reproducibility
 
-Every task is pinned to a specific `base_commit` SHA. The evaluation runner checks out that exact commit before invoking Nanocoder. Results from a run in July 2026 must be exactly reproducible in December 2026, regardless of upstream repository changes. This is a hard requirement, not a preference.
+Every evaluation task is anchored to a specific, immutable repository state (e.g., a locked commit SHA). The orchestrator resets the environment to this exact state before invoking the agent. This ensures that benchmark results remain perfectly reproducible over time, completely insulated from any upstream codebase changes.
 
 ### Real Engineering Tasks
 
@@ -96,7 +99,7 @@ All tasks are sourced from real merged pull requests in real production reposito
 
 ### Transparency
 
-Every inclusion decision — repository selection, task extraction, scoring rationale — is auditable. `repo_inventory.py` scores repositories on five axes and outputs a ranked `repo_list.json` that any maintainer or contributor can inspect. Task JSON files contain the issue link, PR link, ground-truth patch, required files, and test command. Nothing is opaque.
+Every structural decision—from repository selection to the final scoring rationale—is fully auditable. Instead of black-box curation, a transparent engine scores and ranks repositories based on objective complexity metrics. Furthermore, every evaluation task exposes its complete metadata to the community, including the original issue context, the expert-verified golden patch, and the exact verification commands.
 
 ### Extensibility
 
@@ -127,110 +130,8 @@ NanoBench aims to become the standard evaluation suite for the Nano Collective's
 
 ---
 
-## 6. Proposed Architecture
+## 6. Proposed Architecture & Task Lifecycle
 
-### High-Level Architecture
-
-```
-Nano-Collective/nanobench/
-│
-├── schema/
-│   └── task_schema.json          ← JSON format definition (versioned)
-│
-├── tasks/
-│   ├── torax/
-│   │   └── torax-001.json        ← task: problem, required_files, ground_truth, test_command
-│   ├── ianvs/
-│   │   └── ianvs-001.json
-│   ├── langchain-google/
-│   │   └── langchain-google-001.json
-│   └── ... (5-10 repos in v1)
-│
-├── repos/
-│   └── repo_list.json            ← scored repository registry
-│
-├── scripts/
-│   ├── eval_runner.py            ← main evaluation orchestrator
-│   ├── repo_inventory.py         ← scores and indexes repositories
-│   ├── patch_extractor.py        ← isolates ground-truth patches from merged PRs
-│   ├── token_counter.py          ← context-window density modeling
-│   └── validate_tasks.py         ← CI integrity gate for task quality
-│
-├── results/
-│   └── run_<timestamp>.json      ← scored results with failure taxonomy
-│
-├── reports/
-│   └── baseline_report.md        ← human-readable benchmark analysis
-│
-├── CONTRIBUTING.md
-└── README.md
-```
-
-### System Components
-
-**Task Layer** — JSON files defining each evaluation unit. Each task contains:
-- `repo`, `issue_url`, `pr_url`, `base_commit` (SHA)
-- `problem_statement` — the engineering problem description
-- `required_files` — the files an agent must touch to solve the task
-- `ground_truth_patch` — the diff from the original merged PR
-- `test_command` — the command that verifies correctness (`pytest`, `go test`, `yarn test`)
-- `reasoning_category` — one of the taxonomy categories (cross-component dependency, functional flow integrity, etc.)
-- `token_estimate`, `difficulty`, `languages`, `domain`
-
-**Runner Layer** (`eval_runner.py`) — the evaluation orchestrator:
-1. Reads task JSON
-2. Clones the target repo at `base_commit` with `git clone --depth=1` then `git checkout <sha>`
-3. Builds an instruction-rich prompt from `problem_statement` + `required_files` context
-4. Invokes Nanocoder non-interactively:
-```bash
-   nanocoder --provider <provider> --model <model> --mode yolo run "<prompt>" --trust
-```
-5. Runs `test_command` against the modified repository
-6. Scores the result (1.0 / 0.5 / 0.1 / 0.0)
-7. Classifies failure mode from Nanocoder's output
-8. Writes results JSON with full metadata
-
-**Inventory Layer** (`repo_inventory.py`) — scores candidate repositories on five axes (see Dataset Design) and produces `repo_list.json`.
-
-**Validation Layer** (`validate_tasks.py`) — a CI gate that verifies every task for reproducibility, isolation, and evaluation readiness before it enters the dataset.
-
-### Evaluation Workflow
-
-```
-eval_runner.py starts
-│
-▼
-Load task JSON
-(tasks/<repo>/<task-id>.json)
-│
-▼
-Clone repo at base_commit
-(git clone --depth=1, git checkout <sha>)
-│
-▼
-Build prompt
-(problem_statement + required_files list)
-│
-▼
-Invoke Nanocoder
-(nanocoder --provider <p> --model <m> --mode yolo run "<prompt>" --trust)
-│
-▼
-Parse Nanocoder output
-(files touched, tool calls made, tokens consumed)
-│
-▼
-Run test_command
-(pytest / go test / yarn test / make test)
-│
-▼
-Score + classify failure
-(1.0 / 0.5 / 0.1 / 0.0 + failure_mode[])
-│
-▼
-Write results JSON
-(score, failure_mode, provider, model, tokens, time, tool_calls)
-```
 
 ---
 
@@ -238,40 +139,30 @@ Write results JSON
 
 ### Repository Selection Criteria
 
-Repositories are scored on five axes using `repo_inventory.py`. Only repositories scoring ≥12/20 are onboarded:
+To ensure rigorous, objective, and consistent curation across all current and future dataset releases, candidate repositories are evaluated against a deterministic scoring matrix. A repository must achieve a minimum score of 12 out of 20 points to be onboarded into the benchmark:
 
 | Axis | Points | Criteria |
 |---|---|---|
 | Language breadth | 4 | 1pt per distinct language required to solve a typical bug |
 | Cross-file dependency depth | 4 | Avg files read to understand one bug, sampled from 5 closed PRs |
-| Post-Jan-2026 activity | 4 | ≥2 merged PRs/month = 4pts; ≥1/month = 2pts; less = 0pts |
+| Post-April-2026 activity | 4 | ≥2 merged PRs/month = 4pts; ≥1/month = 2pts; less = 0pts |
 | Domain novelty | 4 | 0 if domain already covered; 2 if adjacent; 4 if new domain |
 | Context pressure | 4 | >80k tokens = 4pts; 50–80k = 3pts; 20–50k = 2pts; <20k = 0pts |
-
-### Initial Repository Set (v1 — 5 repos, 10-15 tasks)
-
-These repositories are selected from ones the proposer has personally contributed to and understands at an architectural level:
-
-| Repository | Languages | Domain | Why Selected |
-|---|---|---|---|
-| `google-deepmind/torax` | Python, JAX | Scientific computing / plasma physics | JAX functional programming forces explicit value threading — agents cannot imperatively set attributes. Only scientific computing repo in dataset. PR #1895 already validated as a stress-test task. |
-| `kubeedge/ianvs` | Python | Edge AI benchmarking | Deep knowledge of plugin architecture (scenario→testenv→algorithm→dataset→metrics). Proposer is LFX mentee with 3500+ line contributions. |
-| `langchain-ai/langchain-google` | Python | LLM tooling / Google AI | Tasks span two packages simultaneously (genai + vertexai). `hallucinated_api` is the guaranteed failure mode — SDK class names differ completely between old and new Google AI SDKs. |
-| `meshery/meshery` | Go, JavaScript, React, GraphQL | Cloud native infrastructure | Only Go+React+GraphQL repo. Three-language fix required. GraphQL subscription pattern not present in any other task. |
-| `learningequality/kolibri` | Python, Vue.js, JavaScript | Offline educational platform | Only full-stack cross-language repo. Bugs spanning Django + Morango sync engine + Vue.js frontend require reading Python and JavaScript simultaneously. |
 
 ### Task Extraction Methodology
 
 Tasks are extracted exclusively from real merged pull requests, not from open issues or synthetic generation. The extraction process:
 
-1. Identify a merged PR with clear test coverage and multi-file architectural changes.
-2. Use `patch_extractor.py` to isolate the golden patch from the PR diff.
-3. Record the `base_commit` (the parent commit before the fix was merged).
-4. Clone the repo at `base_commit` and verify the bug reproduces.
-5. Confirm the `test_command` fails at `base_commit` and passes after applying the ground-truth patch.
-6. Verify the Jaccard similarity of the task description against top GitHub code search results is below 0.85 to detect contamination.
+1. **Identification**: Identify a merged PR containing multi-file architectural changes and strong native test coverage.
+2. **Patch Isolation**: Surgically extract the golden patch from the PR diff to establish the ground truth.
+3. **State Pinning**: Record the immutable `base_commit` (the exact parent commit just before the fix was merged).
+4. **Reproducibility Check**: Clone the repository at the `base_commit` and verify the bug natively reproduces in isolation.
+5. **Verification Gate**: Confirm the test suite fails at the `base_commit`, and successfully passes only after applying the ground-truth patch.
+6.**Contamination Screening**: Apply algorithmic similarity checks against public code indexes to ensure the task description cannot be easily recalled from model training memory.
 
 ### Task Schema
+
+Every curated task is compiled into a standardized, machine-readable metadata schema. This schema guarantees that the orchestrator has all the necessary parameters to run the evaluation deterministically. The schema enforces four core metadata categories: Fpr Example :
 
 ```json
 {
@@ -301,7 +192,9 @@ Tasks are extracted exclusively from real merged pull requests, not from open is
 
 ### Ground Truth
 
-Every task's ground truth is the actual merged PR diff, surgically extracted by `patch_extractor.py`. The evaluator knows what a correct solution looks like. Partial credit is awarded when the agent navigates to the right files but implements an incomplete fix.
+The ground truth for every task is the actual merged PR diff. This enables strict pass/fail grading via the native test suite, but also unlocks fractional scoring for pathfinding. Because the orchestrator knows exactly which files need to be edited, agents receive partial credit for successfully navigating to the correct components, even if their final code fix falls short.
+
+It cuts the fluff but keeps the two most important points: the PR diff is the standard, and we give credit for good navigation.
 
 ### Dataset Versioning
 
@@ -330,24 +223,15 @@ nanocoder \
 
 Nanocoder's `--plain` flag (introduced in v1.26.0) can optionally be used for cleaner stdout capture in CI pipelines.
 
-### Task Lifecycle
-
-1. `eval_runner.py` reads the task JSON.
-2. Clones the repository at `base_commit` into an isolated temp directory.
-3. Builds the prompt with the problem statement and `required_files` hint.
-4. Invokes Nanocoder as a subprocess with `cwd` set to the cloned repo. Since Nanocoder sets its working directory from `process.cwd()` at startup, controlling `cwd` in `subprocess.run()` makes the agent operate directly on real repository code — reading actual source files, writing actual changes.
-5. After Nanocoder exits, runs `test_command` as a separate subprocess against the now-modified repository.
-6. Scores the result.
-7. Writes a results JSON with full metadata (score, failure mode, provider, model, tokens consumed, tool calls made, time elapsed).
 
 ### Scoring Strategy
 
 | Score | Label | Condition |
 |---|---|---|
-| 1.0 | Full pass | All tests in `test_command` exit 0 and no pre-existing passing tests are broken. This is the only score that counts as a solved task. |
-| 0.5 | Partial pass | At least 50% of target tests pass AND the agent modified at least one file from `required_files`. Distinguishes correct-but-incomplete from hallucinated. |
-| 0.1 | Wrong approach | Tests fail, but the agent touched at least one file from `required_files`. Logic is incorrect but the agent navigated to the right part of the codebase. |
-| 0.0 | Complete failure | No target tests passed AND the agent touched no required files, touched entirely wrong files, or exited with an error. Includes context-explosion failures where the token budget was exhausted before any edit. |
+| 1.0 | Complete Resolution | All tests in `test_command` exit 0 and no pre-existing passing tests are broken. This is the only score that counts as a solved task. |
+| 0.5 | Partial Resolution | ≥50% of target tests pass AND the agent modified ≥1 file within `required_files`. Distinguishes correct-but-incomplete logic from hallucinated fixes. |
+| 0.1 | Pathfinding Credit | Tests fail (or fail to compile), but the agent successfully navigated to and modified ≥1 file within `required_files`. Rewards architectural localization even if the implemented logic is flawed. |
+| 0.0 | Zero Signal | Tests fail AND zero target files were touched. The agent hallucinated a fix in irrelevant files, or execution halted prematurely (e.g., token exhaustion, API timeout) before an edit was made. |
 
 ### Partial Credit
 
@@ -355,50 +239,55 @@ The 50% threshold for partial pass is intentional. A task with 10 test cases sho
 
 ### Benchmark Outputs
 
-Each run produces:
-- A `run_<timestamp>.json` with per-task results (score, failure mode, provider, model, tokens, tool calls, time)
-- A `baseline_report.md` with aggregated scores broken down by: provider, model, reasoning category, language, domain, and token density
-- A provider comparison table showing `Provider → Model → Task → Score → Failure taxonomy` for every evaluated model
+Each evaluation run deterministically produces three primary artifacts:
+
+- **Raw Telemetry Output**: A structured data payload (JSON) containing per-task execution metrics, including the tiered score, failure classification, model/provider metadata, total tokens consumed, tool-call frequency, and execution time.
+
+- **Aggregated Baseline Report**: A human-readable synthesis document breaking down aggregated scores across multiple dimensions: provider, model, reasoning category, language, domain, and token density.
+
+- **Provider Matrix**: A comparative matrix mapping Provider → Model → Task → Score → Failure Mode, allowing maintainers to instantly identify which LLMs suffer from specific architectural blind spots (e.g., hallucination vs. context exhaustion).
 
 ---
 
 ## 9. Failure Taxonomy
 
-The failure taxonomy is the most important output NanoBench produces. It is the thing that distinguishes NanoBench from every existing benchmark. A score change from 52% to 55% tells you nothing. Knowing that `insufficient_context_read` failures dropped from 62% to 21% after a prompt builder improvement tells you exactly what changed and why.
+The failure taxonomy is the primary diagnostic payload generated by the benchmark. Binary score improvements (e.g., shifting from 52% to 55%) provide zero actionable signal to model developers or framework maintainers. Conversely, observing that `insufficient_context_read` failures dropped from 62% to 21% after an update to a prompt builder provides exact, targeted telemetry
+
+NanoBench maps terminal states to six strict diagnostic categories:
 
 ### Hallucinated APIs (`hallucinated_api`)
 
-The agent calls a method or accesses an attribute that does not exist in the codebase. Common in repos with complex SDKs (e.g., `langchain-google` where the genai and vertexai packages have completely different class hierarchies) or functional paradigms (e.g., torax where JAX prohibits imperative attribute mutation).
+The agent calls a method or accesses an attribute that does not exist in the historical state of the codebase. This is highly common in repositories with complex, evolving SDKs or strict functional paradigms that prohibit imperative mutations.
 
 *Diagnostic signal: test fails with `AttributeError` or `NameError` on a symbol that doesn't exist in `required_files`.*
 
 ### Insufficient Context Reading (`insufficient_context_read`)
 
-The agent did not read enough of the codebase to understand the architectural dependencies before making changes. Manifests as surface-level edits that miss the underlying data flow. The torax dry-run showed this clearly: the agent read 34 files but never read the files that mattered.
+The agent failed to read enough of the repository to map the architectural dependencies before executing changes. This manifests as surface-level logic edits that miss the underlying data flow. Agents may read dozens of files, but fail to locate the actual architectural bottleneck.
 
 *Diagnostic signal: `files_read` is high but `required_files` overlap with `files_edited` is low.*
 
 ### Wrong Abstraction Layer (`wrong_abstraction_layer`)
 
-The agent made changes at the wrong level of the architecture — editing a high-level interface when the fix needed to go into the underlying implementation, or vice versa. Common in plugin-based frameworks like Ianvs.
+The agent injected its logic at the incorrect level of the architecture—for example, editing a high-level interface contract when the fix was actually required in the underlying implementation driver. This is heavily prevalent in deep, plugin-based frameworks.
 
 *Diagnostic signal: agent touched files from `required_files` but tests still fail with an interface mismatch error.*
 
 ### Missing Cross-Component Changes (`missing_cross_language_change`)
 
-The agent fixed one component but missed a parallel change required in another language or package. Common in full-stack repos (kolibri: Python backend + Vue.js frontend) or multi-package repos (langchain-google: genai + vertexai).
+The agent successfully fixed one localized component but missed a parallel architectural change required in another language or package. This routinely occurs in polyglot, full-stack environments (e.g., updating a backend schema but ignoring the frontend state manager).
 
 *Diagnostic signal: partial tests pass (one language's tests) but the other language's tests fail.*
 
 ### Context Window Exhaustion (`context_window_exceeded`)
 
-The agent exhausted its context window or token budget before completing the task. In the torax dry-run, a single task consuming ~52,000 tokens exhausted the Gemini free tier's daily quota on the first run. This failure mode proves that current agents cannot navigate 100k+ LOC repos without expert-verified context guidance.
+The agent exhausted its context window or API token budget before outputting a viable patch. High-complexity architectural tasks frequently exceed standard context limits, proving that current agents struggle to navigate large-scale repositories without highly optimized retrieval.
 
 *Diagnostic signal: Nanocoder exits with a context-size error or rate-limit error before `test_command` is reached.*
 
 ### Partial Fixes (`partial_fix_only`)
 
-The agent implemented a correct fix for part of the task but missed additional required changes. Scores 0.5 (partial pass) rather than 0.0 because the agent demonstrated directional correctness.
+The agent successfully implemented correct logic for a subset of the task but failed to catch all required edge cases. This triggers fractional scoring (0.5) because the agent demonstrated strict directional and partial functional correctness.
 
 *Diagnostic signal: some target tests pass, agent touched files from `required_files`, but full test suite fails.*
 
@@ -407,31 +296,32 @@ The agent implemented a correct fix for part of the task but missed additional r
 As the dataset grows, additional failure categories will be introduced through the task contribution process:
 - `test_not_updated` — agent fixed the implementation but forgot to update/add tests
 - `correct_file_wrong_function` — agent read the right file but edited the wrong function
-- `environment_agency_failure` — agent could not interpret a complex terminal traceback (e.g., JAX JIT compilation error) to iterate on a fix
-
+- `environment_agency_failure` —The agent failed to correctly parse or iterate upon complex terminal tracebacks (e.g., deeply nested compiler errors or strict type-checker outputs) preventing it from self-correcting a failing fix.
 ---
 
-## 10. Benchmark Infrastructure
+## 10. Execution Infrastructure & Isolation
 
-### Repository Isolation
+### Deterministic Workspace Provisioning
 
-Every task runs in an isolated temporary directory. The evaluation runner:
-1. Creates a fresh temp directory for each task.
-2. Clones the repository at `base_commit` with `--depth=1` for speed, then checks out the exact SHA.
-3. Runs Nanocoder with `cwd` set to the cloned directory.
-4. Tears down the temp directory after the task completes.
+To guarantee absolute reproducibility and prevent cross-run state contamination, the orchestrator enforces strict isolation protocols for every evaluation cycle. The evaluation pipeline executes the following lifecycle for every task:
+
+1. `Ephemeral Sandbox Creation`: A pristine, isolated workspace is provisioned exclusively for the current task.
+2. `State Hydration`: The target repository is retrieved via a high-speed shallow clone and immediately hard-reset to the exact, immutable base_commit SHA, ensuring the agent inherits the precise historical state of the codebase.
+3. `Subprocess Injection`: The agent (e.g., Nanocoder) is invoked headlessly with its working directory strictly bound to the isolated sandbox, physically preventing it from accessing external system states or caching layers.
+4. `Ephemeral Teardown`: Upon completion of the verification suite and telemetry extraction, the sandbox is aggressively purged.
 
 This prevents cross-task contamination and ensures every run starts from a clean state.
 
-### Docker & Environment Management
+### Containerization & Dependency Isolation
 
-Repositories with complex dependency chains (C++/CUDA for vllm, Go for meshery) include a `devcontainer.json` or lightweight `Dockerfile` in their task definition. For v1 (Python-only repos: torax, ianvs, langchain-google), Docker is optional. For v2 (polyglot repos), Docker isolation is required.
+Because advanced codebases often rely on complex, system-level dependency chains, native multi-language runtimes, or hardware-specific acceleration, the execution pipeline utilizes an adaptive environment management layer.
 
-### Reproducibility
+The infrastructure handles workspace environments across two distinct strategies:
 
-- Every task is pinned to a `base_commit` SHA. SHA-pinned tasks are immutable.
-- `patch_extractor.py` computes a token-level Jaccard similarity score between the task description and GitHub code search results. Tasks scoring above 0.85 similarity are flagged as potentially contaminated and require manual review before inclusion.
-- All tasks require a `merged_at` timestamp from the GitHub API to verify they post-date the relevant model knowledge cutoffs.
+- **Runtime-Insulated Tasks**: For single-language or interpreted environments (e.g., pure Python ecosystems), the runtime context is isolated via virtual environments or lightweight configuration specs mapped directly to the ephemeral workspace. This guarantees version pinning for specialized mathematical or runtime packages without incurring the container layer's overhead.
+
+- **Containerized Archetypes**: For polyglot codebases or systems with deep native compilation requirements (e.g., Go binaries, compiled C/C++ components, Node/React builds), each task definition bundles a standardized container specification (such as a Dockerfile or development container definition). The orchestrator dynamically spins up a containerized sandbox to execute the agent and run the verification test suite.
+
 
 ### CI Integration
 
@@ -441,13 +331,6 @@ NanoBench will provide a GitHub Actions workflow that:
 - Posts a summary comment with scores and failure taxonomy to the PR.
 
 Maintainers can wire this workflow to run against Nanocoder PRs to catch agent regressions before they ship.
-
-### Reporting
-
-Each benchmark run produces:
-- A machine-readable `run_<timestamp>.json` (full per-task metadata).
-- A human-readable `baseline_report.md` with tables and failure breakdowns.
-- A provider comparison table (for multi-provider runs).
 
 ---
 
@@ -460,7 +343,7 @@ Each benchmark run produces:
 | Task source | GitHub issues (automated scrape) | Real merged PRs (expert-curated) |
 | Task complexity | Mostly single-file, single-language | Multi-file, multi-language, architectural |
 | Contamination control | Weak (most tasks predate model cutoffs) | Strong (post-Jan-2026, Jaccard similarity check) |
-| Failure analysis | Pass/fail only | 8-category failure taxonomy |
+| Failure analysis | Pass/fail only | Granular diagnostic taxonomy (hallucination, abstraction mismatch, context exhaustion) |
 | Provider comparison | Not supported | First-class: same task, all providers |
 | Harness specificity | Generic (model-level) | Nanocoder-specific (full stack: model + harness) |
 | Scoring | Binary | Graded (1.0 / 0.5 / 0.1 / 0.0) |
@@ -484,33 +367,33 @@ NanoBench is the only infrastructure that can answer either question for Nanocod
 
 ### Dataset Contamination
 
-**Risk:** An agent solves a task from training memory rather than reasoning, producing an inflated score.
+**Risk:** An agent solves a task using training memory rather than active reasoning, artificially inflating its evaluation score.
 
-**Mitigation:** Every task is anchored to a commit merged after January 1, 2026. `patch_extractor.py` computes token-level Jaccard similarity between the task description and top GitHub code search results. Any task scoring above 0.85 similarity is flagged and replaced. The `base_commit` SHA and `merged_at` timestamp are stored in every task JSON, making contamination claims auditable and falsifiable.
+**Mitigation:** Every task is strictly post-dated (post-2026) and subjected to automated syntactic similarity screening against public code indexes, ensuring all telemetry remains verifiable and auditable.
 
 ### Repository Maintenance
 
-**Risk:** A target repository undergoes major restructuring, making existing task file paths invalid.
+**Risk:** Conflicting system-level dependencies or runtime mismatches cause evaluation failures unrelated to the agent's logic.
 
-**Mitigation:** Every task is pinned to a specific `base_commit` SHA. Structural changes to the upstream repository do not affect existing tasks. `validate_tasks.py` runs in CI and will flag any task whose file paths cannot be resolved at the pinned commit.
+**Mitigation:**The initial baseline standard focuses on interpreted runtimes, while polyglot environments deploy standardized container configurations to isolate dependencies completely.
 
 ### Environment Drift
 
-**Risk:** Diverse repositories (Python/JAX, Go, JavaScript) have conflicting system dependencies that cause evaluation failures unrelated to agent performance.
+**Risk:** Conflicting system-level dependencies or runtime mismatches cause evaluation failures unrelated to the agent's logic.
 
-**Mitigation:** v1 limits the dataset to Python-only repositories where dependency management is straightforward. Polyglot repos (meshery: Go+React, kolibri: Python+Vue.js) are introduced in v2 with Docker-isolated task environments.
+**Mitigation:** The initial baseline standard focuses on interpreted runtimes, while polyglot environments deploy standardized container configurations to isolate dependencies completely..
 
 ### Evaluation Cost
 
-**Risk:** Running multi-provider evaluations at scale is expensive, and API rate limits make full benchmark runs slow.
+**Risk:** Multi-provider evaluations at scale incur high commercial API costs and face restrictive network rate limits.
 
-**Mitigation:** v1 starts with 10-15 tasks and 2-3 provider comparisons. Expert-metadata injection (providing `required_files` hints in the prompt) reduces unnecessary file exploration by approximately 70%, cutting both cost and run time. A `--dry-run` mode validates the pipeline without invoking the agent. Local Ollama models can run cost-free for baseline comparisons.
+**Mitigation:** The insertion of targeted context boundaries reduces unnecessary file exploration by roughly 70%, while native support for localized open-weight models allows for cost-free baseline verification.
 
 ### Benchmark Bias
 
 **Risk:** Tasks curated by one person reflect that person's domain expertise and may not represent the full range of engineering challenges.
 
-**Mitigation:** v1 is explicitly framed as a curated baseline, not a comprehensive dataset. The `repo_inventory.py` scoring matrix is transparent and auditable. A community contribution pipeline (introduced in v2) allows other contributors to add tasks with validation requirements that must be met before inclusion.
+**Mitigation:** The scoring matrix is fully transparent and auditable, serving as a foundational baseline designed to scale via an open-source, community-driven task contribution pipeline.
 
 ---
 
@@ -526,114 +409,52 @@ Benchmarking Nanocoder exclusively on the Nanocoder repository itself would prod
 
 ### Model-Specific Evaluation
 
-Building NanoBench around Gemini's Live API or Anthropic's specific streaming format would violate the provider-neutrality principle that is central to Nano Collective's mission. This was the original design constraint that made the GSoC Gemini CLI version a weaker fit than the Nanocoder version. Rejected.
+Building the evaluation harness around a proprietary API (e.g., Gemini's Live API or Anthropic's streaming format).
+Violates the core provider-neutrality principle of the Nano Collective. Enforcing vendor lock-in completely undermines the goal of universally comparing multi-model performance across a standardized agent harness. Rejected.
 
 ### Why These Were Not Chosen
 
-All alternatives either compromise the quality of the benchmark (synthetic tasks), narrow the audience (model-specific evaluation), or conflict with Nano Collective's core principles (provider lock-in). The design described in this whitepaper is the only approach that is simultaneously rigorous, provider-neutral, reproducible, and aligned with the collective's stated values.
+All alternatives inherently compromise evaluation quality, narrow the diagnostic audience, or enforce vendor lock-in. The architecture proposed in this whitepaper is the only solution that is simultaneously rigorous, reproducible, and aligned with the Nano Collective's mandate for provider-neutral open-source tooling.
 
 ---
 
 ## 14. Open Questions
 
-### Python vs TypeScript
+- Orchestration Language (Python vs. TypeScript): Should the evaluation core remain in Python for its robust subprocess and data libraries, or be rewritten in TypeScript to share a native build toolchain with Nanocoder?
 
-The evaluation core (`eval_runner.py`, `repo_inventory.py`, `patch_extractor.py`, `validate_tasks.py`) is proposed in Python. Python's subprocess ecosystem, test-runner parsing (pytest, go test, yarn test output formats), and data processing libraries are a natural fit for orchestration code that runs multiple languages' test suites. Since `nanobench` is a separate repository from `nanocoder`, it does not need to share a build or lint toolchain with the main TypeScript codebase. This is confirmed by will-lamerton (Nano Collective member) in issue #621.
+- **Automated vs. Human Evaluation**: While scoring is strictly automated, should we introduce an optional human-in-the-loop review for "Partial Resolution" tasks to distinguish correct-but-incomplete code from plausible hallucinations?
 
-### Automatic vs Human Evaluation
+- **Community Contribution Gates**: What strict programmatic validation checks (e.g., automated reproducibility tests, contamination screening) must be enforced before accepting community-submitted evaluation tasks?
 
-The current scoring model (1.0/0.5/0.1/0.0) is fully automatic, based on test exit codes and file-touch analysis. A small number of tasks (those scoring 0.5) may benefit from human review to distinguish "correct-but-incomplete" from "plausible-but-wrong." v1 uses automated scoring exclusively. Human review as an optional layer is a v2 consideration.
+- **Long-Term Dataset Governance**: As the dataset scales, what is the formal process for prioritizing new architectural frameworks, retiring outdated telemetry, and resolving scoring disputes?
 
-### Community Task Contributions
+- **Dependency State Caching**: How do we mitigate heavy CI latency when installing dependencies (npm, pip, go) for every run? Do we use pre-compiled Docker images or a shared CI artifact cache?
 
-Community-contributed tasks introduce quality risks (poorly specified problems, weak test coverage, or contaminated task descriptions). v2 will introduce a contribution pipeline with required validation steps: the contributor must demonstrate that (a) the bug reproduces at `base_commit`, (b) the ground-truth patch makes the tests pass, and (c) the Jaccard similarity score is below 0.85. Tasks that fail any of these checks are not accepted.
+- **Semantic Diff Matching**: Because exact string-matching on patches is brittle, what is our standard for evaluating semantic equivalence (e.g., AST-level diffing vs. pure test-suite verification)?
 
-### Long-Term Dataset Governance
+- **Prompt Sanitization**: How aggressively should we scrub historical PR descriptions to prevent leaking the solution without accidentally rendering the task unsolvable?
 
-As NanoBench grows, governance questions arise: who decides which repos are onboarded, how are outdated tasks retired, and how are disputes about scoring resolved? These questions are not answered in this whitepaper and are intentionally deferred to the collective's governance process after v1 establishes a baseline.
+- **Compute & Token Budgets**: What is the acceptable financial cost ceiling for running complex, multi-step tasks across commercial APIs, and how do we enforce limits without truncating valid agent reasoning?
 
 ---
 
-## 15. Roadmap
+## 15. Roadmap [ v1 image ]
 
-### MVP (Proof of Concept — current state)
+### Version 1.0 Deliverables
 
-- ✅ 6 task JSON files across 6 repositories (torax, ianvs, langchain-google, meshery, kolibri, vllm)
-- ✅ Working `eval_runner.py` with dry-run mode validated
-- ✅ Failure taxonomy classification operational
-- ✅ Scoring rubric (1.0/0.5/0.1/0.0) implemented
-- ✅ Real empirical evidence of pipeline working end-to-end (torax dry-run, 6 days of testing)
+- Curated Diagnostic Dataset: A foundational matrix of 6 high-complexity, multi-file tasks spanning diverse, polyglot architectural environments, with all states strictly pinned and validated.
 
-### Version 0.1 (First Nano Collective release — immediate next steps)
+- Automated Orchestration Engine: A headless, fully automated evaluation pipeline that dynamically injects boundaries, triggers Nanocoder in non-interactive mode, and extracts fractional scores via native test suites.
 
-- Repo scaffold: `Nano-Collective/nanobench` created with schema, tasks, scripts, and CONTRIBUTING.md
-- 3 expert-curated tasks with full validation (torax-001, ianvs-001, langchain-google-001)
-- `eval_runner.py` adapted to invoke Nanocoder's non-interactive run mode (`nanocoder --provider <p> --model <m> --mode yolo run "<prompt>" --trust`)
-- First dry-run report shared with will-lamerton showing Nanocoder performance on all 3 tasks across at least 2 providers
-- `validate_tasks.py` running in CI
+- Provider Performance Matrix: A comprehensive, multi-model execution baseline evaluating the identical task dataset across leading commercial APIs and local open-weight models to isolate harness efficiency from raw model capability.
 
-### Version 1.0
-
-- 5-10 repositories, 10-20 expert-curated tasks
-- Multi-provider comparison: at least Claude (Anthropic), Gemini (OpenRouter), and one local Ollama model evaluated on the same task set
-- Provider comparison table published as `baseline_report.md`
-- Failure taxonomy report with breakdown by category, language, and token density
-- CI workflow for Nanocoder PRs that runs a configurable subset of NanoBench tasks
+- Actionable Telemetry & CI Integration: Automated generation of the granular failure taxonomy matrix, bundled with a plug-and-play continuous integration workflow designed to block regression in future Nanocoder updates.
 
 ### Future Directions
 
-- v2: polyglot repositories (meshery Go+React+GraphQL, kolibri Python+Vue.js), Docker-isolated task environments
-- v3: community task contributions with automated validation pipeline
-- v3+: harness contribution score — measure the delta between raw API performance and Nanocoder-harness performance on the same task, isolating Nanocoder's contribution from the underlying model
+- v2: **Polyglot Architectural Integration**: Expand the evaluation matrix to encompass complex, multi-language repositories, supported by dynamic, containerized execution sandboxes to handle native compilation and deep dependency chains.
+- v3: **Decentralized Task Curation**: Transition from a closed-loop curated baseline to a community-driven contribution pipeline, enforced by strict programmatic validation checks to prevent task contamination and maintain dataset integrity.
+- v3+: **Harness Efficiency Telemetry**: Introduce advanced differential scoring to measure the precise delta between a raw model's native API performance and its capability when routed through the execution harness, mathematically quantifying the value-add of the orchestration layer.
 - Long-term: NanoBench as the standard evaluation layer for all Nano Collective agent tooling, not just Nanocoder
 
 ---
-
-## 16. Success Criteria
-
-### Technical Success
-
-- The evaluation pipeline runs end-to-end for all tasks without manual intervention.
-- Results are reproducible: the same task, provider, and model produce the same score on separate runs (controlling for model non-determinism with fixed temperature where supported).
-- At least two providers are compared on the same task set with meaningful score differences visible in the report.
-- The failure taxonomy correctly classifies the type of failure for every non-full-pass result.
-
-### Community Success
-
-- The whitepaper is accepted through the Nano Collective's five-stage pipeline.
-- `Nano-Collective/nanobench` is created with the proposer as maintainer and product owner.
-- At least one other Nano Collective contributor submits a task that passes the validation pipeline by the end of v1.
-- The baseline report is cited by at least one Nanocoder release note as evidence that a change improved agent performance.
-
-### Research Success
-
-- NanoBench produces at least one finding that is not available from SWE-bench or any existing benchmark: a result that is specific to Nanocoder as a harness and that changes how a maintainer thinks about a design decision.
-- The failure taxonomy surfaces a failure pattern that leads to a concrete Nanocoder improvement (a prompt builder change, a context injection strategy, or a tool-calling modification).
-
----
-
-## 17. Conclusion
-
-NanoBench is the evaluation infrastructure Nanocoder needs and the benchmark the broader agent evaluation space is missing. It is built on a simple observation: the harness matters as much as the model. Nanocoder is a harness. Without a benchmark that holds Nanocoder constant and varies the model, neither maintainers nor users can make informed decisions about what actually makes the agent better.
-
-The pipeline works. The empirical evidence is real — 6 days of testing, a confirmed end-to-end run, real failure modes surfaced on real production code. The design is sound — provider-neutral, reproducible, expert-curated, and transparent. And the fit with Nano Collective's principles is exact: privacy-respecting (all evaluation runs locally or against user-supplied credentials), local-first (Ollama support is first-class), and open for all (the task schema, scoring logic, and failure taxonomy are fully public and contributable).
-
-The next step is moving through the Nano Collective's whitepaper pipeline, creating `Nano-Collective/nanobench`, and shipping a 3-task proof of concept that demonstrates real Nanocoder performance across two providers. Everything after that builds on a foundation that already works.
-
----
-
-## 18. References
-
-- Nano Collective / nanocoder: https://github.com/Nano-Collective/nanocoder
-- Nanocoder non-interactive run mode: https://github.com/Nano-Collective/nanocoder/blob/main/docs/features/commands.md
-- Nanocoder v1.26.0 release (--plain flag for CI): https://github.com/Nano-Collective/organisation/discussions/43
-- NanoBench issue#621: https://github.com/Nano-Collective/nanocoder/issues/621
-- Proposer's eval dataset repository (Gemini CLI version, validated pipeline): https://github.com/RONAK-AI647/gemini-cli-eval-dataset
-- Torax PR#1895 (ground-truth task source): https://github.com/google-deepmind/torax/pull/1895
-- KubeEdge/Ianvs PR#292 (proposer's LFX mentorship contribution): https://github.com/kubeedge/ianvs/pull/292
-- Artificial Analysis Coding Agent Index (May 2026): https://artificialanalysis.ai/coding-agents
-- SWE-MERA: https://arxiv.org/pdf/2507.11059
-- SWE-bench+: https://arxiv.org/pdf/2410.06992
-- Coding Agent Harness Comparison 2026: https://techstackups.com/comparisons/coding-agent-harness-comparison-2026/
-- FeatureBench: https://arxiv.org/pdf/2602.10975
-- Nano Collective project pipeline: https://docs.nanocollective.org/collective/projects/how-a-project-comes-to-life
