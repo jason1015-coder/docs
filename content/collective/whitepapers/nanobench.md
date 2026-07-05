@@ -465,6 +465,7 @@ protect dataset integrity without being so high it discourages contribution.
 As the dataset scales, what is the formal process for onboarding new
 architectural domains, retiring outdated tasks, and resolving scoring
 disputes? This is a collective-level decision, not a technical one.
+
 ---
 
 ## 15. Roadmap [ v1 scope ]
