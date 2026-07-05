@@ -71,6 +71,19 @@ export default function Footer() {
                     json-up
                   </a>
                 </li>
+                <li>
+                  <a
+                    href="https://github.com/Nano-Collective/prompt-scrubber"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#0000EE] dark:hover:text-[#A1A1AA] transition-colors flex items-center gap-2 group"
+                  >
+                    <span className="text-[#0000EE] dark:text-[#A1A1AA] opacity-0 -ml-4 transition-all group-hover:opacity-100 group-hover:ml-0">
+                      &gt;
+                    </span>
+                    prompt-scrub
+                  </a>
+                </li>
               </ul>
             </div>
 
