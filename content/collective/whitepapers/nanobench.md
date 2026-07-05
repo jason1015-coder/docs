@@ -132,6 +132,39 @@ NanoBench aims to become the standard evaluation suite for the Nano Collective's
 
 ## 6. Proposed Architecture & Task Lifecycle
 
+```
+[ Task Telemetry Trigger ]
+            │
+            ▼
+┌───────────────────────────────────────┐
+│     Manifest Ingestion Layer (TS)     │ ──► Parses task constraints & metadata
+└───────────────────────────────────────┘
+            │
+            ▼
+┌───────────────────────────────────────┐
+│    DevContainer Sandbox Provisioner   │ ──► Native virtual envs (uv/pnpm) for local runs,
+└───────────────────────────────────────┘     pre-baked Docker images for CI pipelines
+            │
+            ▼
+┌───────────────────────────────────────┐
+│     Headless Execution Loop           │ ──► Invokes Nanocoder via a true --headless flag,
+└───────────────────────────────────────┘     bypassing the Ink.js interactive render tree
+            │
+            ▼
+┌───────────────────────────────────────┐
+│     Deterministic Telemetry Sink      │ ──► Nanocoder flushes a raw JSON log trace
+└───────────────────────────────────────┘     directly to a structured disk file
+            │
+            ▼
+┌───────────────────────────────────────┐
+│      Native Verification Harness      │ ──► Runs localized project test suites 
+└───────────────────────────────────────┘     directly inside the container
+            │
+            ▼
+┌───────────────────────────────────────┐
+│       Diagnostic Scoring Engine       │ ──► Maps the JSON log dump to fractional
+└───────────────────────────────────────┘     scores and the failure taxonomy
+```
 
 ---
 
