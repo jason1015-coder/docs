@@ -181,7 +181,7 @@ To ensure rigorous, objective, and consistent curation across all current and fu
 | Cross-file dependency depth | 4 | Avg files read to understand one bug, sampled from 5 closed PRs |
 | Post-April-2026 activity | 4 | ≥2 merged PRs/month = 4pts; ≥1/month = 2pts; less = 0pts |
 | Domain novelty | 4 | 0 if domain already covered; 2 if adjacent; 4 if new domain |
-| Context pressure | 4 | >80k tokens = 4pts; 50–80k = 3pts; 20–50k = 2pts; <20k = 0pts |
+| Context pressure | 4 | >80k tokens = 4pts; 50–80k = 3pts; 20–50k = 2pts; &lt;20k = 0pts |
 
 ### Task Extraction Methodology
 
