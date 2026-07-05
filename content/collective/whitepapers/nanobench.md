@@ -4,7 +4,8 @@ description: "A provider-neutral benchmark for evaluating AI coding agents on re
 sidebar_order: 1
 proposer: "Ronak Raj"
 proposer_github: "RONAK-AI647"
-status: "Draft"
+status: "In public review"
+
 ---
 
 # NanoBench
