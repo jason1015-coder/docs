@@ -3,7 +3,6 @@ import path from "node:path";
 import { notFound } from "next/navigation";
 import { compileMdx } from "nextra/compile";
 import { evaluate } from "nextra/evaluate";
-import { Suspense } from "react";
 import { getWhitepaperIssueCounts } from "@/lib/whitepapers";
 import { useMDXComponents } from "../../../mdx-components";
 
@@ -114,15 +113,5 @@ export default async function CollectivePage({ params }: PageProps) {
     notFound();
   }
 
-  return (
-    <Suspense
-      fallback={
-        <div className="p-12 text-center opacity-50 font-mono text-sm uppercase tracking-widest">
-          [ COMPILING_MDX... ]
-        </div>
-      }
-    >
-      <CompiledCollectiveSlugContent slug={slug} found={found} />
-    </Suspense>
-  );
+  return <CompiledCollectiveSlugContent slug={slug} found={found} />;
 }

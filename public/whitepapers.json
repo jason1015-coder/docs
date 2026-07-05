@@ -23,17 +23,6 @@
       "sidebar_order": 1
     },
     {
-      "slug": "prompt-scrubber",
-      "title": "prompt-scrub",
-      "description": "A working whitepaper for a small open source tool that scrubs identifying content from LLM prompts and messages before they leave the user's machine",
-      "proposer": "Will Lamerton",
-      "proposer_github": "will-lamerton",
-      "status": "Building",
-      "review_opens": "2026-05-19",
-      "review_closes": "2026-06-18",
-      "sidebar_order": 2
-    },
-    {
       "slug": "nano-os",
       "title": "NanoOS",
       "description": "A whitepaper for an open source agent orchestration CLI that lets a user compose an oracle agent, specialist sub-agents, skill packs, and custom tools into a personal operating system of agents",

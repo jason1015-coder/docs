@@ -55,6 +55,17 @@ export const PROJECTS: ProjectConfig[] = [
       name: "json-up",
     },
   },
+  {
+    id: "prompt-scrub",
+    name: "prompt-scrub",
+    description:
+      "A local-first tool that strips identifying content out of your prompts before they reach a cloud LLM.",
+    type: "library",
+    repo: {
+      owner: "Nano-Collective",
+      name: "prompt-scrubber",
+    },
+  },
   // Add more projects here
 ];
 

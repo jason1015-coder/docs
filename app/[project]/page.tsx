@@ -3,7 +3,6 @@ import path from "node:path";
 import { notFound, redirect } from "next/navigation";
 import { compileMdx } from "nextra/compile";
 import { evaluate } from "nextra/evaluate";
-import { Suspense } from "react";
 import { MainLayout } from "@/components/MainLayout";
 import { getAllProjects, getProject } from "@/lib/projects";
 import { useMDXComponents } from "../../mdx-components";
@@ -81,17 +80,7 @@ export default async function ProjectPage({ params }: PageProps) {
   const localContent = getLocalContent(projectId);
   if (localContent) {
     return (
-      <Suspense
-        fallback={
-          <MainLayout>
-            <div className="p-12 text-center opacity-50 font-mono text-sm uppercase tracking-widest">
-              [ COMPILING_MDX... ]
-            </div>
-          </MainLayout>
-        }
-      >
-        <CompiledContent projectId={projectId} localContent={localContent} />
-      </Suspense>
+      <CompiledContent projectId={projectId} localContent={localContent} />
     );
   }
 

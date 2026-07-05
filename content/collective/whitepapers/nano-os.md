@@ -63,7 +63,7 @@ A fourth principle, specific to this project, is worth naming:
 An agent substrate is a privacy surface in its own right. The threat model names what NanoOS does and does not defend against in v1:
 
 **The user's data leaking to cloud models via sub-agents.**
-Out of scope for the substrate itself. Mitigated by routing relevant sub-agents through the [Private Inference Proxy](/collective/whitepapers/private-inference-proxy) and the [Prompt Scrubber](/collective/whitepapers/prompt-scrubber). NanoOS does not duplicate their work; it makes their use clean.
+Out of scope for the substrate itself. Mitigated by routing relevant sub-agents through the [Private Inference Proxy](/collective/whitepapers/private-inference-proxy) and the [Prompt Scrubber](/prompt-scrub/docs). NanoOS does not duplicate their work; it makes their use clean.
 
 **A malicious or buggy sub-agent reading more than it should.**
 In scope. The permission model has to be real, not advisory. A sub-agent that needs filesystem access should declare it; the oracle should mediate it; the user should see what was read. See "Permissions and capabilities" below.
@@ -212,7 +212,7 @@ A flat agent with a huge prompt could be coached to do most of this. A bespoke s
 
 This is the part of the design that earns the OS framing. The user is not chaining prompts. They are populating a small set of agents that they can think about the way they think about the tools they already use, that they own, that runs on their machine, and that grows the way their work grows.
 
-The arrangement is also a test of the project's principles. Every model call can be local. Every tool runs under a declared scope. Every memory file is on disk and readable. The cloud only enters the picture for the calls that genuinely need cloud capability, and when it does it goes through the [Private Inference Proxy](/collective/whitepapers/private-inference-proxy) with the [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) in front of it. The indie developer example works at every privacy posture the user wants to take, from "everything local" to "selectively cloud, scrubbed and proxied."
+The arrangement is also a test of the project's principles. Every model call can be local. Every tool runs under a declared scope. Every memory file is on disk and readable. The cloud only enters the picture for the calls that genuinely need cloud capability, and when it does it goes through the [Private Inference Proxy](/collective/whitepapers/private-inference-proxy) with the [Prompt Scrubber](/prompt-scrub/docs) in front of it. The indie developer example works at every privacy posture the user wants to take, from "everything local" to "selectively cloud, scrubbed and proxied."
 
 ## v1 scope
 
@@ -242,7 +242,7 @@ What v1 ships is "a substrate, a stable set of contracts, an arrangement format,
 
 Most collective projects compose with this substrate through the generic contracts (sub-agent, skill, tool). A few have a more specific integration shape worth naming:
 
-- **The [Prompt Scrubber](/collective/whitepapers/prompt-scrubber)** runs as middleware on any sub-agent that talks to a model. Scrubbed prompts go out; rehydrated responses come back. The oracle does not have to know.
+- **The [Prompt Scrubber](/prompt-scrub/docs)** runs as middleware on any sub-agent that talks to a model. Scrubbed prompts go out; rehydrated responses come back. The oracle does not have to know.
 - **The [Private Inference Proxy](/collective/whitepapers/private-inference-proxy)** is the configured network path for cloud model calls. A sub-agent that uses a cloud model talks to the proxy, not directly to the provider.
 - **Nanotune** is upstream of the model layer rather than a runtime component. Models fine tuned through Nanotune are first class oracles or sub-agent backbones.
 

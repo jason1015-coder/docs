@@ -63,7 +63,7 @@ Privacy work that does not name its threat model is decoration. The project need
 Defended partial to strong, depending on mode. See modes below.
 
 **The provider reading prompt content.**
-Out of scope for the proxy itself. Addressed by the sibling [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) project, which runs locally and strips identifying content before the provider sees it. The scrubber reduces identity in prompt content but cannot eliminate semantic leakage. Full content protection at the provider would require emerging techniques (attested inference, secure computation) that are not yet practical at scale.
+Out of scope for the proxy itself. Addressed by the sibling [Prompt Scrubber](/prompt-scrub/docs) project, which runs locally and strips identifying content before the provider sees it. The scrubber reduces identity in prompt content but cannot eliminate semantic leakage. Full content protection at the provider would require emerging techniques (attested inference, secure computation) that are not yet practical at scale.
 
 **A passive network observer (ISP, public wifi).**
 Defended. TLS to the proxy, TLS from the proxy to the provider.
@@ -81,7 +81,7 @@ A live threat model document is more useful than a one time write up. As the pro
 
 ## Proposed approach
 
-Two modes. Both are network side proxies that handle keys and identity at the provider layer. Content layer privacy (scrubbing identifying information out of the prompt itself) is the job of a separate sibling project, the [Prompt Scrubber](/collective/whitepapers/prompt-scrubber), which composes with either mode below.
+Two modes. Both are network side proxies that handle keys and identity at the provider layer. Content layer privacy (scrubbing identifying information out of the prompt itself) is the job of a separate sibling project, the [Prompt Scrubber](/prompt-scrub/docs), which composes with either mode below.
 
 ### Mode A: Collective keyed
 
@@ -111,7 +111,7 @@ The privacy gain in Mode B is narrower than in Mode A. It is real (IP and networ
 
 ### Composable companion: the Prompt Scrubber
 
-A network side proxy cannot reduce what the provider reads in the prompt itself. That is the job of the [Prompt Scrubber](/collective/whitepapers/prompt-scrubber), a separate sibling project scoped in its own whitepaper. The scrubber runs locally on the user's machine, strips identifying content from prompts and tool results, and feeds the cleaned messages to whatever LLM endpoint the user calls (direct, or through this proxy).
+A network side proxy cannot reduce what the provider reads in the prompt itself. That is the job of the [Prompt Scrubber](/prompt-scrub/docs), a separate sibling project scoped in its own whitepaper. The scrubber runs locally on the user's machine, strips identifying content from prompts and tool results, and feeds the cleaned messages to whatever LLM endpoint the user calls (direct, or through this proxy).
 
 The two projects compose. A user running the scrubber in front of Mode A with payment privacy configured gets the strongest privacy stack the collective is offering. The scrubber can also be used entirely on its own with no NC involvement at all. The proxy and the scrubber ship on independent timelines and version cleanly together where used in combination.
 
@@ -153,7 +153,7 @@ A working profile per mode, sharpened against the direct call baseline. Preserve
 
 ### Composing with the Prompt Scrubber
 
-The [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) runs on the user's machine before any network call. When composed with the proxy, the scrubber strips identifying content from the prompt and tool results first; the proxy then handles the network and key layer. The provider receives a scrubbed prompt from a proxy IP under an NC key.
+The [Prompt Scrubber](/prompt-scrub/docs) runs on the user's machine before any network call. When composed with the proxy, the scrubber strips identifying content from the prompt and tool results first; the proxy then handles the network and key layer. The provider receives a scrubbed prompt from a proxy IP under an NC key.
 
 For users who want the strongest stack the collective offers, the composition is: scrubber + Mode A with payment privacy configured. Used together, the provider sees neither the user's identity nor identifying content in the prompt, and NC sees only a pseudonymous credit holder.
 
@@ -225,7 +225,7 @@ The proxy is, deliberately, not a model router or a prompt rewriter. Routing acr
 - **VPN or Tor in front of the provider call.** Addresses IP, not the key, not behavioural correlation. Many providers throttle or block known exit nodes. This project is closer to a purpose built relay than a generic anonymiser.
 - **Trusting the provider's privacy policy.** Discounted on principle. The point of this project is to make that trust unnecessary.
 
-(A standalone client side scrubber was on the original "alternatives" list, then promoted to Mode C of the proxy, then extracted into its own sibling project. See the [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) whitepaper.)
+(A standalone client side scrubber was on the original "alternatives" list, then promoted to Mode C of the proxy, then extracted into its own sibling project. See the [Prompt Scrubber](/prompt-scrub/docs) whitepaper.)
 
 ## Competitive landscape
 
@@ -249,7 +249,7 @@ These are the concerns that were identified during the public review window. The
 
 4. **Mode B's market is unclear.** The privacy gain over a generic VPN is "purpose built for LLM traffic and run by an organisation you might trust more." That is a marketing differentiator, not a technical one. Whether users will pay for it at the volume the project needs to sustain itself is genuinely uncertain. *Confirmed during review and recorded in the "Decision" section as the central reason Mode B alone does not earn a standalone project.*
 
-5. **The strongest composite privacy claim depends on the scrubber landing.** Without the scrubber, the proxy on its own does not address identity in the prompt content itself. That gap is real but not a proxy problem; it is tracked in the [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) whitepaper. The risk for this project is that messaging the proxy alone as "private LLM access" without the scrubber overstates what the proxy delivers. *Recorded in the "Decision" section as the argument for shipping the scrubber standalone rather than as part of a proxy project.*
+5. **The strongest composite privacy claim depends on the scrubber landing.** Without the scrubber, the proxy on its own does not address identity in the prompt content itself. That gap is real but not a proxy problem; it is tracked in the [Prompt Scrubber](/prompt-scrub/docs) whitepaper. The risk for this project is that messaging the proxy alone as "private LLM access" without the scrubber overstates what the proxy delivers. *Recorded in the "Decision" section as the argument for shipping the scrubber standalone rather than as part of a proxy project.*
 
 6. **No engagement with the competitive landscape yet.** See the section above. The whitepaper does not currently say what NC's defensible differentiator is beyond stated values. That answer has to exist before v1. *Surfaced during review as a contributing reason Mode A in a curated-provider shape was not pursued: the market (OpenRouter, LiteLLM, Portkey, others) is already served by better-resourced projects.*
 
@@ -263,7 +263,7 @@ These are the questions the whitepaper listed at publication. The reviewer-time 
 
 2. **Modes in v1.** Both A and B, or B first and A later? B is the lightest lift but the weakest claim. A is the stronger network privacy story, especially with payment privacy configured. The provider TOS question (see Open Risks) may force the answer. *Closed: see "Decision" section. The review-time research on provider TOS confirmed that Mode A as designed is not shippable without a legal entity and provider relationships the collective does not have, and that a curated-provider Mode A would compete in a market already served by better-resourced projects. Mode B on its own does not earn a standalone project. Neither mode ships.*
 
-3. **Sequencing relative to the scrubber.** The [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) ships on a different timeline (probably first, since it has none of the legal entity or commercial layer blockers). Decide whether the proxy waits for the scrubber, ships alongside, or ships independently and integrates later. *Closed: not applicable. The scrubber continues independently as its own project. The composition point is recorded in the "Decision" section as something a future, smaller Mode B-shaped proposal could revisit if a real use case surfaced, without needing a full proxy project.*
+3. **Sequencing relative to the scrubber.** The [Prompt Scrubber](/prompt-scrub/docs) ships on a different timeline (probably first, since it has none of the legal entity or commercial layer blockers). Decide whether the proxy waits for the scrubber, ships alongside, or ships independently and integrates later. *Closed: not applicable. The scrubber continues independently as its own project. The composition point is recorded in the "Decision" section as something a future, smaller Mode B-shaped proposal could revisit if a real use case surfaced, without needing a full proxy project.*
 
 4. **Threat model bounds.** Where does the proxy explicitly stop? Legal compulsion, traffic analysis at the upstream proxy, side channels in shared infrastructure. Each should be named in scope or out of scope rather than left implicit. *Closed: not applicable. The threat model section above is preserved as the design history; a future proposal would need to land a concrete threat model document as part of its own graduation checklist.*
 
@@ -307,7 +307,7 @@ The recommendation was reached inside the 30-day public review window, in respon
 
 **Where the project would have to land to be viable.** A project at this shape becomes viable when, together: a frontier-lab relationship the collective can win, or a curated set of redistribution-friendly providers worth building a Mode A aggregator on top of; a confidential-compute path that changes Mode A's trust story from "trust us" to "verify the binary"; and a clear answer to the legal-entity question that the proxy's billing posture requires. None of these are within v1 reach today. Any one of them landing would justify a new whitepaper that revisits this ground on its merits rather than as a stale phase-2 promise.
 
-**What is happening instead.** The [Prompt Scrubber](/collective/whitepapers/prompt-scrubber) whitepaper continues separately. The scrubber is the part of the privacy stack this whitepaper reached for, and the part that earns its keep on its own. If a future need surfaces for a relay sitting in front of provider calls — say, a use case where the scrubber-plus-proxy composition is load-bearing for a real user — the smaller, honest shape of Mode B plus scrubber composition is a viable starting point; it would not need this whitepaper's scope to build, and it does not need to be a collective project rather than a community utility.
+**What is happening instead.** The [Prompt Scrubber](/prompt-scrub/docs) whitepaper continues separately. The scrubber is the part of the privacy stack this whitepaper reached for, and the part that earns its keep on its own. If a future need surfaces for a relay sitting in front of provider calls — say, a use case where the scrubber-plus-proxy composition is load-bearing for a real user — the smaller, honest shape of Mode B plus scrubber composition is a viable starting point; it would not need this whitepaper's scope to build, and it does not need to be a collective project rather than a community utility.
 
 ## Review path
 
