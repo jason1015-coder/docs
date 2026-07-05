@@ -433,7 +433,7 @@ architectural domains, retiring outdated tasks, and resolving scoring
 disputes? This is a collective-level decision, not a technical one.
 ---
 
-## 15. Roadmap [ v1 image ]
+## 15. Roadmap [ v1 scope ]
 
 ### Version 1.0 Deliverables
 
