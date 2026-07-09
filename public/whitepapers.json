@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-09T07:50:28.981Z",
+  "generated_at": "2026-07-09T17:05:40.975Z",
   "count": 6,
   "whitepapers": [
     {
@@ -57,8 +57,11 @@
     },
     {
       "slug": "marketplace",
-      "title": "Canopy (proposed name)",
+      "title": "Canopy",
       "description": "A portable layer for publishing and installing agent assets across any harness — skills, tools, prompts, sub-agents — written once and installed everywhere the collective ships an adapter",
+      "proposer": "Matt Spence",
+      "proposer_github": "mrspence",
+      "status": "Building",
       "sidebar_order": 6
     }
   ]
