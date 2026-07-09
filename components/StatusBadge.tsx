@@ -28,8 +28,11 @@ const STATUS_STYLES: Record<WhitepaperStatus, string> = {
   Superseded: "bg-gray-500/15 text-gray-400 border-gray-500/30",
 };
 
-function isValidStatus(value: string): value is WhitepaperStatus {
-  return (WHITEPAPER_STATUSES as readonly string[]).includes(value);
+function matchStatus(value: string): WhitepaperStatus | null {
+  const normalized = value.trim().toLowerCase();
+  return (
+    WHITEPAPER_STATUSES.find((s) => s.toLowerCase() === normalized) ?? null
+  );
 }
 
 function formatDate(iso: string): string {
@@ -50,13 +53,17 @@ function daysUntil(iso: string): number | null {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
-export function StatusBadge({ status, reviewCloses }: StatusBadgeProps) {
-  const style = isValidStatus(status)
-    ? STATUS_STYLES[status]
+export function StatusBadge({
+  status,
+  reviewOpens,
+  reviewCloses,
+}: StatusBadgeProps) {
+  const matched = matchStatus(status);
+  const style = matched
+    ? STATUS_STYLES[matched]
     : "bg-gray-500/15 text-gray-400 border-gray-500/30";
 
-  const showReviewDates = status === "In public review" && reviewCloses;
-  const remaining = showReviewDates ? daysUntil(reviewCloses) : null;
+  const reviewText = buildReviewText(matched, reviewOpens, reviewCloses);
 
   return (
     <span className="not-prose inline-flex items-center gap-2 text-sm">
@@ -65,15 +72,41 @@ export function StatusBadge({ status, reviewCloses }: StatusBadgeProps) {
       >
         {status}
       </span>
-      {showReviewDates && (
+      {reviewText && (
         <span className="text-[var(--x-color-fg-muted,#888)]">
-          {remaining !== null && remaining > 0
-            ? `Closes in ${remaining} day${remaining === 1 ? "" : "s"} (${formatDate(reviewCloses)})`
-            : remaining !== null && remaining <= 0
-              ? `Review window closed ${formatDate(reviewCloses)}`
-              : `Closes ${formatDate(reviewCloses)}`}
+          {reviewText}
         </span>
       )}
     </span>
   );
+}
+
+/**
+ * Text for the review window shown next to the status badge. When a paper is
+ * actively in review we count down to the close date; for any other status we
+ * still surface the window (opens/closes) whenever the dates are present, so a
+ * paused, approved, or shipped paper keeps showing when its review ran.
+ */
+function buildReviewText(
+  status: WhitepaperStatus | null,
+  reviewOpens?: string,
+  reviewCloses?: string,
+): string | null {
+  if (status === "In public review" && reviewCloses) {
+    const remaining = daysUntil(reviewCloses);
+    if (remaining !== null && remaining > 0) {
+      return `Closes in ${remaining} day${remaining === 1 ? "" : "s"} (${formatDate(reviewCloses)})`;
+    }
+    if (remaining !== null && remaining <= 0) {
+      return `Review window closed ${formatDate(reviewCloses)}`;
+    }
+    return `Closes ${formatDate(reviewCloses)}`;
+  }
+
+  if (reviewOpens && reviewCloses) {
+    return `Review: ${formatDate(reviewOpens)} to ${formatDate(reviewCloses)}`;
+  }
+  if (reviewCloses) return `Review closed ${formatDate(reviewCloses)}`;
+  if (reviewOpens) return `Review opened ${formatDate(reviewOpens)}`;
+  return null;
 }
