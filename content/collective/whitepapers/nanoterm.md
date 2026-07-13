@@ -47,7 +47,7 @@ A tightly focused utility that does one thing exceptionally well.
 - Natural language to shell command translation via a simple CLI invocation (e.g., `nano "find all empty directories"`).
 - An interactive `[y/N/edit]` approval flow before execution, ensuring users always have the final say.
 - Capturing `stdout` and `stderr` to feed back into the ephemeral session, allowing the user to chain immediate follow-up commands (e.g., "now delete the ones you found").
-- Multi-provider support (OpenAI, Anthropic, Gemini) matching Nanocoder's existing configuration.
+- **Provider agnosticism:** Multi-provider support matching Nanocoder's configuration, treating local models (e.g., Ollama) as first-class citizens alongside cloud endpoints (OpenAI, Anthropic).
 
 **Out of scope:**
 - Editing source code files or performing codebase refactoring.
@@ -93,7 +93,7 @@ Human approval is only effective if the user understands what they are approving
 5. **Execution & Feedback.** Upon execution (if `y` is selected), the output is printed to the terminal normally. To support chaining, the output is temporarily written to a short-lived local cache scoped to the parent shell (for example, a temporary file keyed by the shell's PID). This allows the user to return to their normal shell prompt, but still chain a follow-up request like `nano "delete the largest one"` on their next invocation. If `edit` is selected, the user is dropped into an prompt to manually tweak the command before execution.
 
 ### Privacy and State
-Because `stdout`/`stderr` can contain sensitive data (API keys, PII), this short-lived buffer remains strictly local and expires automatically. How buffered context is sanitized before being sent to an external provider is a separate privacy consideration.
+Because `stdout`/`stderr` and context gathering can contain sensitive data (API keys, PII, hostnames), the short-lived buffer remains strictly local. Furthermore, when using cloud providers, any buffered context is seamlessly routed through the Nano Collective's `prompt-scrubber` utility to strip identifying content before it leaves the local machine.
 
 ## Relationship with Nanocoder
 
@@ -108,7 +108,5 @@ Despite sharing the same provider configuration format, Nanoterm has zero runtim
 ## Future ideas
 
 While v1 is kept intentionally minimal to validate the core loop, future iterations could explore:
-- **Local models by default.** Making local, quantized models (via Ollama or Llama.cpp) the default to guarantee zero latency and absolute privacy.
 - **Shell completions.** Native tab completions for the `nano` binary itself.
-- **Integration with `prompt-scrub`.** Seamlessly routing prompts through the Nano Collective's `prompt-scrub` tool to remove PII (Paths, IP addresses, emails) before hitting a cloud provider.
 - **Command history injection.** Providing the last 5 executed commands as context to the model to better understand the user's current goal.
