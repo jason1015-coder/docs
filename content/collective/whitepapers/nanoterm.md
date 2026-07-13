@@ -37,7 +37,7 @@ The design philosophy of `Nanoterm` is its most critical aspect. It must feel li
 - **Shell-first.** The terminal is the product. There is no chat UI, no lengthy explanations of why a command was chosen unless explicitly requested, and no conversational filler. The output is strictly a command ready to be run.
 - **Ultra-lightweight.** Instant startup is a hard requirement. There is no indexing of the local filesystem, no scanning of the workspace, and no persistent background agent maintaining state between unrelated sessions.
 - **Human approval.** Safety is paramount. `Nanoterm` will *never* execute commands automatically. It will always present the generated command to the user for review. The user must be able to explicitly approve the execution or edit the command inline if the AI hallucinated or missed a nuance.
-- **Ephemeral.** A `Nanoterm` session exists only while solving one specific task. Once the command is executed, the session is discarded. There is no long-term memory to pollute future interactions.
+- **Ephemeral.** Ephemeral refers to **long-term state**, not the absence of any temporary context. Nanoterm intentionally avoids persistent memory and background services, but may retain short-lived local context solely to support immediate follow-up commands within the same shell session.
 
 ## Scope (v1)
 
@@ -81,7 +81,10 @@ Similarly, "shared prompt techniques" refers to adopting the Nano Collective eco
 
    Execute? [y/N/edit]: 
    ```
-5. **Execution & Feedback.** Upon execution (if `y` is selected), the output is printed to the terminal normally. It is also temporarily buffered, allowing the user to immediately chain a follow-up request like `nano "delete the largest one"` without losing context. If `edit` is selected, the user is dropped into an prompt to manually tweak the command before execution.
+5. **Execution & Feedback.** Upon execution (if `y` is selected), the output is printed to the terminal normally. To support chaining, the output is temporarily written to a short-lived local cache scoped to the parent shell (for example, a temporary file keyed by the shell's PID). This allows the user to return to their normal shell prompt, but still chain a follow-up request like `nano "delete the largest one"` on their next invocation. If `edit` is selected, the user is dropped into an prompt to manually tweak the command before execution.
+
+### Privacy and State
+Because `stdout`/`stderr` can contain sensitive data (API keys, PII), this short-lived buffer remains strictly local and expires automatically. How buffered context is sanitized before being sent to an external provider is a separate privacy consideration.
 
 ## Relationship with Nanocoder
 
