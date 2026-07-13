@@ -97,16 +97,36 @@ Because `stdout`/`stderr` and context gathering can contain sensitive data (API 
 
 ## Relationship with Nanocoder
 
-A common question is why this isn't simply a feature within Nanocoder. 
-
-Nanocoder is designed for long-running, stateful coding sessions. It requires project understanding, uses complex agent orchestration, and coordinates multiple tools to read, write, and test code. 
-
-`Nanoterm` is the opposite: it uses minimal context, prioritizes fast startup, and handles single, ephemeral operations. They are highly complementary. A developer might use `Nanoterm` to quickly figure out the exact `git` incantation to untangle a messy rebase, and then switch to Nanocoder to implement a complex feature across five different files in that newly cleaned repository.
+`Nanoterm` and `Nanocoder` are highly complementary. A developer might use `Nanoterm` to quickly figure out the exact `git` incantation to untangle a messy rebase, and then switch to Nanocoder to implement a complex feature across five different files in that newly cleaned repository.
 
 Despite sharing the same provider configuration format, Nanoterm has zero runtime or build-time dependencies on the Nanocoder codebase. This is a deliberate design choice: extracting a shared provider library would gate Nanoterm's development on upstream Nanocoder releases and introduce unnecessary coordination overhead. A shared library remains a future possibility once both tools have stabilized, but v1 prioritizes shipping speed and independence.
+
+## Alternatives considered
+
+### A Nanocoder subcommand
+A common question is why Nanoterm isn't simply a feature within Nanocoder (e.g., `nanocoder --term`). Nanocoder is designed for long-running, stateful coding sessions. It requires project understanding, uses complex agent orchestration, and coordinates multiple tools. `Nanoterm` is the opposite: it prioritizes fast startup and handles ephemeral operations. A subcommand would carry too much overhead for sub-second shell tasks.
+
+### Third-party CLI tools
+Tools like `whai`, `aichat`, and `gorilla-cli` already exist in this space. Unlike general AI terminal assistants, Nanoterm is intentionally focused on fast, single-task command generation with explicit human approval, local-first workflows, and seamless integration with the Nano Collective ecosystem (reusing provider configurations and `prompt-scrubber` privacy guarantees).
+
+## Success picture (v1)
+
+What would prove this idea? A successful v1 proves that developers can translate natural language into safe shell commands with minimal friction, while preserving Nanoterm's shell-first philosophy and privacy-first design. Example metrics could include:
+- Fast startup and execution latency.
+- High command acceptance rate (users select `y` without needing to `edit` or retry).
+- A safe approval flow where destructive commands are clearly flagged.
+- Positive developer feedback on everyday shell tasks.
 
 ## Future ideas
 
 While v1 is kept intentionally minimal to validate the core loop, future iterations could explore:
 - **Shell completions.** Native tab completions for the `nano` binary itself.
 - **Command history injection.** Providing the last 5 executed commands as context to the model to better understand the user's current goal.
+
+## Open questions
+
+To help guide the Stage 3 review, feedback is especially welcome on the following live decisions:
+- **Binary naming:** The current proposal uses `nano`, which heavily overloads the GNU `nano` text editor. Should we default to `nt`, `nterm`, or something else?
+- **Config reuse mechanism:** What is the cleanest way to reuse `agents.config.json` in v1 without creating a hard dependency on the Nanocoder repository?
+- **Local vs cloud default:** Should local models be the out-of-the-box default, or should we default to cloud providers for better initial command accuracy?
+- **Safety validation scope:** Should we introduce stricter semantic validation for commands, or is human approval + heuristic detection sufficient for v1?
