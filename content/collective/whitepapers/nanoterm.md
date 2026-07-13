@@ -57,7 +57,15 @@ A tightly focused utility that does one thing exceptionally well.
 
 ## Proposed approach
 
-`Nanoterm` will be built as a standalone NPM package (e.g., `@nano-collective/nanoterm`), keeping it completely decoupled from the main `nanocoder` repository. This ensures it remains an ultra-lightweight utility, while still utilizing the Nano Collective's underlying prompt techniques and LLM provider connections.
+`Nanoterm` will be built as a standalone NPM package (e.g., `@nano-collective/nanoterm`), keeping it completely decoupled from the main `nanocoder` repository. This ensures it remains an ultra-lightweight utility.
+
+### Provider architecture
+
+To resolve the tension between remaining completely decoupled and utilizing Nano Collective's provider connections, **my preferred direction for v1** is sharing the configuration format while keeping provider implementations independent. 
+
+Nanoterm could reuse the existing `agents.config.json` format so users only configure providers once. The exact config lookup strategy (shared location, fallback, or dedicated Nanoterm config) is still open for discussion. However, Nanoterm will implement its own provider calls against the Vercel AI SDK independently—it will not import or depend on any Nanocoder source code. The coupling is strictly at the config-file format level.
+
+Similarly, "shared prompt techniques" refers to adopting the Nano Collective ecosystem's system prompt conventions (e.g., command-only output, no filler) rather than sharing literal prompt code.
 
 ### The pipeline
 
@@ -82,6 +90,8 @@ A common question is why this isn't simply a feature within Nanocoder.
 Nanocoder is designed for long-running, stateful coding sessions. It requires project understanding, uses complex agent orchestration, and coordinates multiple tools to read, write, and test code. 
 
 `Nanoterm` is the opposite: it uses minimal context, prioritizes fast startup, and handles single, ephemeral operations. They are highly complementary. A developer might use `Nanoterm` to quickly figure out the exact `git` incantation to untangle a messy rebase, and then switch to Nanocoder to implement a complex feature across five different files in that newly cleaned repository.
+
+Despite sharing the same provider configuration format, Nanoterm has zero runtime or build-time dependencies on the Nanocoder codebase. This is a deliberate design choice: extracting a shared provider library would gate Nanoterm's development on upstream Nanocoder releases and introduce unnecessary coordination overhead. A shared library remains a future possibility once both tools have stabilized, but v1 prioritizes shipping speed and independence.
 
 ## Future ideas
 
