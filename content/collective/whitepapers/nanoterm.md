@@ -67,6 +67,15 @@ Nanoterm could reuse the existing `agents.config.json` format so users only conf
 
 Similarly, "shared prompt techniques" refers to adopting the Nano Collective ecosystem's system prompt conventions (e.g., command-only output, no filler) rather than sharing literal prompt code.
 
+### Safety design
+
+Human approval is only effective if the user understands what they are approving. Rather than relying solely on a `[y/N/edit]` prompt, Nanoterm adds lightweight safety layers while keeping the interface simple:
+
+* **Safe by default:** Pressing `Enter` defaults to `N` and aborts execution.
+* **Explain-on-request:** Users can request a concise explanation of the proposed command before deciding.
+* **Danger detection:** Commands matching common destructive patterns are clearly flagged and require explicit confirmation.
+* **Scope:** Nanoterm intentionally avoids full shell parsing or semantic validation in v1. More advanced validation can be explored as a future enhancement.
+
 ### The pipeline
 
 1. **Invocation.** The user runs the CLI with a query: `nano "free up disk space"`.
@@ -79,7 +88,7 @@ Similarly, "shared prompt techniques" refers to adopting the Nano Collective eco
    Proposed command:
    > find . -name "node_modules" -type d -prune -size +1G
 
-   Execute? [y/N/edit]: 
+   Execute? [y/N/edit/?]: 
    ```
 5. **Execution & Feedback.** Upon execution (if `y` is selected), the output is printed to the terminal normally. To support chaining, the output is temporarily written to a short-lived local cache scoped to the parent shell (for example, a temporary file keyed by the shell's PID). This allows the user to return to their normal shell prompt, but still chain a follow-up request like `nano "delete the largest one"` on their next invocation. If `edit` is selected, the user is dropped into an prompt to manually tweak the command before execution.
 
