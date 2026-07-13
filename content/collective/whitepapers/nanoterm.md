@@ -47,7 +47,7 @@ A tightly focused utility that does one thing exceptionally well.
 - Natural language to shell command translation via a simple CLI invocation (e.g., `nano "find all empty directories"`).
 - An interactive `[y/N/edit]` approval flow before execution, ensuring users always have the final say.
 - Capturing `stdout` and `stderr` to feed back into the ephemeral session, allowing the user to chain immediate follow-up commands (e.g., "now delete the ones you found").
-- **Provider agnosticism:** Multi-provider support matching Nanocoder's configuration, treating local models (e.g., Ollama) as first-class citizens alongside cloud endpoints (OpenAI, Anthropic).
+- **Provider agnosticism:** Support the same provider configuration model as Nanocoder, including OpenAI-compatible endpoints, Anthropic, Google, local models (e.g., Ollama), and other providers supported through `agents.config.json`.
 
 **Out of scope:**
 - Editing source code files or performing codebase refactoring.
@@ -57,7 +57,7 @@ A tightly focused utility that does one thing exceptionally well.
 
 ## Proposed approach
 
-`Nanoterm` will be built as a standalone NPM package (e.g., `@nano-collective/nanoterm`), keeping it completely decoupled from the main `nanocoder` repository. This ensures it remains an ultra-lightweight utility.
+`Nanoterm` will be built as a standalone NPM package (e.g., `@nanocollective/nanoterm`), keeping it completely decoupled from the main `nanocoder` repository. This ensures it remains an ultra-lightweight utility.
 
 ### Provider architecture
 
