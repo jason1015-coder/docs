@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-15T06:25:43.206Z",
-  "count": 7,
+  "generated_at": "2026-07-15T19:26:23.728Z",
+  "count": 8,
   "whitepapers": [
     {
       "slug": "nanobench",
@@ -76,6 +76,17 @@
       "proposer_github": "mrspence",
       "status": "Building",
       "sidebar_order": 6
+    },
+    {
+      "slug": "scriptura",
+      "title": "Scriptura (working title)",
+      "description": "A working whitepaper for an open source, local-first AI code editor that replaces the proprietary editing and agent experience of Cursor with a model-agnostic, privacy-respecting shell built on open tooling",
+      "proposer": "Jason-Chiu",
+      "proposer_github": "jason1015-coder",
+      "status": "In public review",
+      "review_opens": "2026-07-15",
+      "review_closes": "2026-08-14",
+      "sidebar_order": 7
     }
   ]
 }
