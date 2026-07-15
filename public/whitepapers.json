@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-10T07:49:34.474Z",
+  "generated_at": "2026-07-15T06:25:43.206Z",
   "count": 7,
   "whitepapers": [
     {
@@ -52,7 +52,7 @@
       "description": "A working whitepaper for an installable Nanocoder driven workflow that runs security and code audits across a GitHub organisation's repositories, with configurable rule packs and automatic issue filing",
       "proposer": "Will Lamerton",
       "proposer_github": "will-lamerton",
-      "status": "Build Approved",
+      "status": "Building",
       "review_opens": "2026-05-22",
       "review_closes": "2026-06-21",
       "sidebar_order": 4
