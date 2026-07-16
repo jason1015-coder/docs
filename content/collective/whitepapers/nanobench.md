@@ -148,13 +148,13 @@ NanoBench aims to become the standard evaluation suite for the Nano Collective's
             │
             ▼
 ┌───────────────────────────────────────┐
-│     Headless Execution Loop           │ ──► Invokes Nanocoder via a true --headless flag,
+│     Headless Execution Loop           │ ──► Invokes Nanocoder via --plain --json flags,
 └───────────────────────────────────────┘     bypassing the Ink.js interactive render tree
             │
             ▼
 ┌───────────────────────────────────────┐
-│     Deterministic Telemetry Sink      │ ──► Nanocoder flushes a raw JSON log trace
-└───────────────────────────────────────┘     directly to a structured disk file
+│     Deterministic Telemetry Capture   │ ──► The orchestrator captures the structured JSON
+└───────────────────────────────────────┘      run report directly from stdout
             │
             ▼
 ┌───────────────────────────────────────┐
@@ -240,23 +240,25 @@ The dataset is versioned via Git tags (`v0.1`, `v1.0`, etc.). Every `base_commit
 
 ### Execution Pipeline
 
-NanoBench invokes Nanocoder in non-interactive run mode — the same mode Nanocoder v1.19.0 explicitly designed for CI/CD pipelines and automation scripts:
+NanoBench invokes Nanocoder in non-interactive run mode — the same mode Nanocoder explicitly designed for CI/CD pipelines and automation scripts:
 
 ```bash
 nanocoder \
   --provider <provider> \
   --model <model> \
   --mode yolo \
-  --trust \
+  --trust-directory \
+  --plain \
+  --json \
   run "<problem_statement>\n\nKey files to focus on:\n<required_files>"
 ```
 
 - `--mode yolo`: auto-accepts all tool calls, including bash execution, without prompting.
-- `--trust`: skips the first-run directory trust prompt (ephemeral, does not modify `trustedDirectories`).
-- `--provider` / `--model`: fully specify the agent stack being evaluated. The same command with different provider/model flags produces a directly comparable result on the same task.
+- `--trust-directory`: skips the first-run directory trust prompt (ephemeral, does not modify `trustedDirectories`).
+- `--provider` / `--model`: fully specify the agent stack being evaluated. 
+- ` --plain` / `--json`: bypasses the interactive Ink.js UI and emits a structured JSON report (`{ kind, exitCode, toolCalls[], filesChanged[] }`) directly to `stdout` for deterministic parsing.
 
-Nanocoder's `--plain` flag (introduced in v1.26.0) can optionally be used for cleaner stdout capture in CI pipelines.
-
+Note on Token Tracking: To fully support the `context_window_exceeded` failure taxonomy, NanoBench will coordinate a minor upstream feature request with the Nano Collective to add a `usage` block (token counts) to the existing `--json` run report.
 
 ### Scoring Strategy
 
@@ -275,7 +277,7 @@ The 50% threshold for partial pass is intentional. A task with 10 test cases sho
 
 Each evaluation run deterministically produces three primary artifacts:
 
-- **Raw Telemetry Output**: A structured data payload (JSON) containing per-task execution metrics, including the tiered score, failure classification, model/provider metadata, total tokens consumed, tool-call frequency, and execution time.
+- **Raw Telemetry Output**: Extracted directly from Nanocoder's `--json` `stdout` payload, this report exposes `toolCalls[]` and `filesChanged[]` to compute exactly what files were read and edited, mapping directly to the failure taxonomy.
 
 - **Aggregated Baseline Report**: A human-readable synthesis document breaking down aggregated scores across multiple dimensions: provider, model, reasoning category, language, domain, and token density.
 
