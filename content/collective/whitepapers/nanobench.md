@@ -260,6 +260,17 @@ nanocoder \
 
 Note on Token Tracking: To fully support the `context_window_exceeded` failure taxonomy, NanoBench will coordinate a minor upstream feature request with the Nano Collective to add a `usage` block (token counts) to the existing `--json` run report.
 
+### Execution Modes & The Navigation Delta
+
+Unconstrained codebase exploration is highly token-intensive. Early dry-runs on complex repositories  demonstrated that agents often exhaust standard API tier quotas purely on file exploration before attempting a fix—resulting in a 0.0 score for quota exhaustion rather than an architectural failure. 
+
+To reconcile the tradeoff between measuring navigation and maintaining reproducible run costs, NanoBench defines two evaluation modes:
+
+1. **Hinted Mode (Default):** The agent receives the `<problem_statement>` appended with the `<required_files>` metadata array. This isolates pure implementation ability. Given the right architectural map, can the agent produce a correct fix? Categories like `hallucinated_api` and `wrong_abstraction_layer` are primarily measured here.
+2. **Navigation Mode (Opt-in):** The agent receives *only* the problem statement. This tests the full stack: can the agent find *and* fix the bug? The `0.1 Pathfinding Credit` and `insufficient_context_read` signals are only meaningful—and only awarded—when running in this mode.
+
+The performance delta between these two modes serves as a novel diagnostic metric, quantifying exactly how much of a given model's failure rate is caused by poor pathfinding versus poor implementation.
+
 ### Scoring Strategy
 
 | Score | Label | Condition |
@@ -415,7 +426,7 @@ configuration. Polyglot environments run inside fully containerized sandboxes, e
 ### Evaluation Cost
 **Risk:** Multi-provider evaluations at scale incur high API costs and hit rate limits.
 
-**Mitigation:** Expert-metadata injection reduces unnecessary file exploration significantly, cutting both cost and run time. Local open-weight models provide a cost-free baseline for comparison.
+**Mitigation:** NanoBench utilizes **Hinted Mode** as the default execution path. By injecting expert metadata, the framework prevents runaway API costs caused by unbounded file exploration, making it financially feasible to run continuous CI regressions. Maintainers can selectively trigger **Navigation Mode** for deep-dive pathfinding evaluations when token budgets permit.
 
 ### Benchmark Bias
 **Risk:** Tasks curated by one person reflect a narrow domain slice.
