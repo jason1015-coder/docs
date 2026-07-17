@@ -98,6 +98,12 @@ Every evaluation task is anchored to a specific, immutable repository state (e.g
 
 All tasks are sourced from real merged pull requests in real production repositories. No synthetic tasks. No LLM-generated task descriptions. The "Curation Paradox" is a guiding principle: **we cannot rely on an LLM to select the tasks we use to benchmark an LLM.** If an agent already possessed the architectural depth to distinguish a syntax fix from a multi-component reasoning bottleneck, this dataset would already be obsolete. Curation must be expert-led.
 
+### The Grading Paradox
+
+The same reasoning that governs task curation governs scoring. **If a model cannot be trusted to decide which tasks belong in the benchmark, it cannot be trusted to decide whether a run of that benchmark succeeded**. For this reason, every terminal state in NanoBench — pass, partial
+pass, or failure category — is assigned by a deterministic rule engine reading structured telemetry, never by a model reading logs and rendering a judgment.
+**Section 9.1 defines this mechanism in full.**
+
 ### Transparency
 
 Every structural decision—from repository selection to the final scoring rationale—is fully auditable. Instead of black-box curation, a transparent engine scores and ranks repositories based on objective complexity metrics. Furthermore, every evaluation task exposes its complete metadata to the community, including the original issue context, the expert-verified golden patch, and the exact verification commands.
@@ -183,6 +189,19 @@ To ensure rigorous, objective, and consistent curation across all current and fu
 | Domain novelty | 4 | 0 if domain already covered; 2 if adjacent; 4 if new domain |
 | Context pressure | 4 | >80k tokens = 4pts; 50–80k = 3pts; 20–50k = 2pts; <20k = 0pts |
 
+### Architectural Complexity Tiers
+
+To systematically probe an agent's reasoning depth, NanoBench abandons simplistic line-count metrics in favor of four **Architectural Complexity Tiers**. These tiers categorize the cognitive load and reasoning radius required to solve the task. 
+
+Crucially, this taxonomy is grounded in mechanistic interpretability research regarding how Large Language Models encode hierarchical structure. Transformer layers encode progressively more abstract representations: shallow layers process local syntactic patterns, middle layers build relational graphs (e.g., imports and function calls), and deep layers encode abstract systemic invariants. NanoBench's tiers map directly to this cognitive architecture:
+
+| Tier | Designation | Cognitive Radius | Target Agent Behavior | Diagnostic Implication |
+| :--- | :--- | :--- | :--- | :--- |
+| **Tier 1** | **Isolated Edit** | Localized syntax/logic within a single file. | Read file → identify logic gap → edit. | **Baseline Competence.** Models failing here lack fundamental code comprehension. Run-to-run variance should be zero. |
+| **Tier 2** | **Interface Mapping** | Tracing dependencies across 2–5 files. | Search → trace import chains → reconcile interface contracts. | **Relational Reasoning.** Tests the middle transformer layers. Failure indicates an inability to maintain coherent state across API boundaries. |
+| **Tier 3** | **System Refactor** | Comprehending module graphs and invariants across 5–15 files. | Investigate structure → map dependencies → plan → execute multi-file changes. | **Architectural Abstraction.** Tests deep transformer layers. Failure indicates the agent's planning capacity breaks down when coordinating system-wide rules. |
+| **Tier 4** | **Investigative Debugging** | Multi-step hypothesis testing where root causes are obfuscated. | Investigate → form hypothesis → test → refine → implement. | **Sustained Inference.** The ceiling task. High run-to-run variance is expected here, separating standard models from frontier reasoning engines. |
+
 ### Task Extraction Methodology
 
 Tasks are extracted exclusively from real merged pull requests, not from open issues or synthetic generation. The extraction process:
@@ -196,7 +215,7 @@ Tasks are extracted exclusively from real merged pull requests, not from open is
 
 ### Task Schema
 
-Every curated task is compiled into a standardized, machine-readable metadata schema. This schema guarantees that the orchestrator has all the necessary parameters to run the evaluation deterministically. The schema enforces four core metadata categories: Fpr Example :
+Every curated task is compiled into a standardized, machine-readable metadata schema. This schema guarantees that the orchestrator has all the necessary parameters to run the evaluation deterministically. The schema enforces four core metadata categories: For Example :
 
 ```json
 {
@@ -208,7 +227,7 @@ Every curated task is compiled into a standardized, machine-readable metadata sc
   "base_commit": "<sha>",
   "languages": ["python", "jax"],
   "domain": "scientific computing",
-  "difficulty": "very-hard",
+  "complexity_tier": "Tier 3 (System Refactor)",
   "task_type": "feature",
   "reasoning_category": "functional_flow_integrity",
   "token_estimate": 52000,
@@ -298,41 +317,119 @@ Each evaluation run deterministically produces three primary artifacts:
 
 ## 9. Failure Taxonomy
 
-The failure taxonomy is the primary diagnostic payload generated by the benchmark. Binary score improvements (e.g., shifting from 52% to 55%) provide zero actionable signal to model developers or framework maintainers. Conversely, observing that `insufficient_context_read` failures dropped from 62% to 21% after an update to a prompt builder provides exact, targeted telemetry
+The failure taxonomy is the primary diagnostic payload generated by the benchmark. Binary score improvements (e.g., shifting from 52% to 55%) provide zero actionable signal to model developers or framework maintainers. Conversely, observing that `insufficient_context_read` failures dropped from 62% to 21% after an update to a prompt builder provides exact, targeted telemetry.
+
+### 9.1 Classification Mechanism
+
+Every failure category in this taxonomy is assigned by a deterministic rule
+engine, not a model. The engine reads only structured fields that already exist in Nanocoder's `--json` run report — `toolCalls[]`, `filesChanged[]`, exit codes, and, once the upstream `usage` block lands, token counts together with the static `required_files` array from the task schema. No log text is summarized or judged by an LLM at any point in this pipeline. This follows directly from the Grading Paradox in §4: a benchmark that will not let a model pick its own tasks should not let a model decide why it failed one.
+
+**Assignment order.** A run's terminal state is checked against the six
+categories in a fixed sequence. The first rule that matches is the label that
+is applied, and no later rule is evaluated once a match is found. This removes
+the need for a "which one is more severe" judgment call — the order itself is
+the precedence rule.
+
+1. **Execution halted before any edit.** If Nanocoder exits on a context-size
+   or rate-limit error and `filesChanged[]` is empty, the run is
+   `context_window_exceeded`, regardless of what a test run might otherwise
+   have shown. A run that never reached the point of editing code cannot also
+   be a partial fix.
+2. **No required-file overlap.** If nothing in `filesChanged[]` intersects
+   `required_files`, the run is `insufficient_context_read` in Navigation Mode,
+   or scores 0.0 (Zero Signal) in Hinted Mode — checked before any test output
+   is inspected.
+3. **Required-file overlap, full failure, missing-symbol error.** If
+   `filesChanged[]` intersects `required_files` but the test run fails on an
+   `AttributeError` or `NameError` referencing a symbol that does not exist in
+   the historical state of `required_files`, the run is `hallucinated_api`.
+4. **Required-file overlap, full failure, interface-level error.** Same
+   overlap condition as above, but the failure is a type or interface mismatch
+   rather than a missing symbol: `wrong_abstraction_layer`.
+5. **Partial test pass.** If at least 50% of target tests pass and
+   required-file overlap is nonzero, the run is `partial_fix_only`. This rule
+   is only reached if rules 1–4 did not match, so a run that partially passed
+   despite an earlier context warning is still scored as a genuine partial
+   fix — the run produced a gradable artifact, which is the stronger signal.
+6. **Cross-language split (Navigation Mode, polyglot tasks only).** One
+   language's test suite passes fully while another fails:
+   `missing_cross_language_change`.
+**Structurally impossible overlaps.** Some category pairs cannot both apply to
+the same run, by construction rather than by rule ordering:
+ 
+| Category A | Category B | Why they cannot co-occur |
+|---|---|---|
+| `context_window_exceeded` | `partial_fix_only` | The former requires `filesChanged[]` to be empty; the latter requires nonzero required-file overlap. |
+| `context_window_exceeded` | `hallucinated_api` / `wrong_abstraction_layer` | Both require a completed test run; a context-exhausted run never reaches `test_command`. |
+| `hallucinated_api` | `wrong_abstraction_layer` | Both require full test failure with required-file overlap, but are separated by error type (missing symbol vs. interface mismatch) — a single failure has one dominant error type, checked in fixed order. |
+ 
+**Open limitation.** Rules 3 and 4 depend on string-matching exception types
+inside a stack trace, which is more fragile than the pure `filesChanged[]`
+overlap checks used by every other rule. This is the least deterministic part
+of the taxonomy today, and it is treated as such — see the updated open
+question in §14 for how this gets validated before it is trusted at scale.
+ 
+---
+
+### 9.2 Signal Confidence Level(1-4)
+ 
+Not every diagnostic signal in this taxonomy carries the same certainty. Some
+come straight from structured fields with no interpretation required; others
+depend on matching text inside an error message, which is inherently less
+reliable. NanoBench makes this explicit with four confidence levels, ranked from most to least direct:
+ 
+- **Level 1 — Structural signal.** Computed purely from `filesChanged[]`
+  against `required_files`. No interpretation involved. Backs
+  `insufficient_context_read`, `partial_fix_only`, and
+  `missing_cross_language_change`.
+- **Level 2 — Outcome signal.** Pass/fail counts from `test_command`,produced
+  by the target repository's own test runner rather than by Nanocoder. Backs
+  the 0.5 / 1.0 scoring thresholds directly.
+- **Level 3 — Process signal.** Nanocoder's own exit code, e.g. a context-size or rate-limit error. Deterministic, but its accuracy is only as good as
+  Nanocoder's own error reporting — the same upstream dependency already noted
+  in §8 regarding the `usage` block.
+- **Level 4 — Content signal.** String-matching against exception type inside a
+  stack trace. Backs `hallucinated_api` and `wrong_abstraction_layer`. This is
+  the least certain level in the taxonomy and is flagged as a known limitation
+  rather than presented as equally reliable to Levels 1–3.
+Each category below is tagged with its level so the taxonomy states its own
+confidence level rather than leaving it implicit.
+ 
+---
 
 NanoBench maps terminal states to six strict diagnostic categories:
 
-### Hallucinated APIs (`hallucinated_api`)
+### Hallucinated APIs (`hallucinated_api`)→ Level 4
 
 The agent calls a method or accesses an attribute that does not exist in the historical state of the codebase. This is highly common in repositories with complex, evolving SDKs or strict functional paradigms that prohibit imperative mutations.
 
 *Diagnostic signal: test fails with `AttributeError` or `NameError` on a symbol that doesn't exist in `required_files`.*
 
-### Insufficient Context Reading (`insufficient_context_read`)
+### Insufficient Context Reading (`insufficient_context_read`)→ Level 1
 
 The agent failed to read enough of the repository to map the architectural dependencies before executing changes. This manifests as surface-level logic edits that miss the underlying data flow. Agents may read dozens of files, but fail to locate the actual architectural bottleneck.
 
 *Diagnostic signal: `files_read` is high but `required_files` overlap with `files_edited` is low.*
 
-### Wrong Abstraction Layer (`wrong_abstraction_layer`)
+### Wrong Abstraction Layer (`wrong_abstraction_layer`)→ Level 4
 
 The agent injected its logic at the incorrect level of the architecture—for example, editing a high-level interface contract when the fix was actually required in the underlying implementation driver. This is heavily prevalent in deep, plugin-based frameworks.
 
 *Diagnostic signal: agent touched files from `required_files` but tests still fail with an interface mismatch error.*
 
-### Missing Cross-Component Changes (`missing_cross_language_change`)
+### Missing Cross-Component Changes (`missing_cross_language_change`)→ Level 1
 
 The agent successfully fixed one localized component but missed a parallel architectural change required in another language or package. This routinely occurs in polyglot, full-stack environments (e.g., updating a backend schema but ignoring the frontend state manager).
 
 *Diagnostic signal: partial tests pass (one language's tests) but the other language's tests fail.*
 
-### Context Window Exhaustion (`context_window_exceeded`)
+### Context Window Exhaustion (`context_window_exceeded`)→ Level 3
 
 The agent exhausted its context window or API token budget before outputting a viable patch. High-complexity architectural tasks frequently exceed standard context limits, proving that current agents struggle to navigate large-scale repositories without highly optimized retrieval.
 
 *Diagnostic signal: Nanocoder exits with a context-size error or rate-limit error before `test_command` is reached.*
 
-### Partial Fixes (`partial_fix_only`)
+### Partial Fixes (`partial_fix_only`) Level 1 + Level 2
 
 The agent successfully implemented correct logic for a subset of the task but failed to catch all required edge cases. This triggers fractional scoring (0.5) because the agent demonstrated strict directional and partial functional correctness.
 
@@ -465,9 +562,9 @@ with Nanocoder? This affects long-term maintainability and contributor
 onboarding friction.
 
 ### Automated vs. Human Evaluation
-Scoring is fully automated via native test suites. Should an optional
-human-in-the-loop review layer be introduced for partial-resolution tasks,
-to distinguish correct-but-incomplete logic from plausible hallucinations?
+ 
+Scoring is fully automated via native test suites, and category assignment is
+fully automated via the deterministic rule engine in §9.1. The one part of the taxonomy that is not yet independently validated is Level 4: the string-matching rules that separate `hallucinated_api` from `wrong_abstraction_layer`. Before these two categories are treated as trustworthy at scale, a human-reviewed spot-check against a sample of runs is needed — specifically checking whether the exception-type matching rule agrees with a human reading the same stack trace. This is a narrower and more concrete question than general human-in-the-loop review of partial-resolution scores, and it is the one open item that most directly affects whether the taxonomy's headline categories can be cited with confidence.
 
 ### Community Contribution Gates
 What programmatic validation requirements must a community-submitted task
