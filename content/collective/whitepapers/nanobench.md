@@ -215,7 +215,7 @@ Tasks are extracted exclusively from real merged pull requests, not from open is
 
 ### Task Schema
 
-Every curated task is compiled into a standardized, machine-readable metadata schema. This schema guarantees that the orchestrator has all the necessary parameters to run the evaluation deterministically. The schema enforces four core metadata categories: For Example :
+Every curated task is compiled into a standardized, machine-readable metadata schema. This schema guarantees that the orchestrator has all the necessary parameters to run the evaluation deterministically. The schema enforces four core metadata categories: for example:
 
 ```json
 {
@@ -275,7 +275,7 @@ nanocoder \
 - `--mode yolo`: auto-accepts all tool calls, including bash execution, without prompting.
 - `--trust-directory`: skips the first-run directory trust prompt (ephemeral, does not modify `trustedDirectories`).
 - `--provider` / `--model`: fully specify the agent stack being evaluated. 
-- ` --plain` / `--json`: bypasses the interactive Ink.js UI and emits a structured JSON report (`{ kind, exitCode, toolCalls[], filesChanged[] }`) directly to `stdout` for deterministic parsing.
+- ` --plain` / `--json`: bypasses the interactive Ink.js UI and emits a structured JSON report (`{ kind, exitCode, toolCalls[], filesChanged[], temperature }`) directly to `stdout` for deterministic parsing. The `temperature` field records the actual sampling parameter used for the run, per §8.5.
 
 Note on Token Tracking: To fully support the `context_window_exceeded` failure taxonomy, NanoBench will coordinate a minor upstream feature request with the Nano Collective to add a `usage` block (token counts) to the existing `--json` run report.
 
@@ -302,6 +302,56 @@ The performance delta between these two modes serves as a novel diagnostic metri
 ### Partial Credit
 
 The 50% threshold for partial pass is intentional. A task with 10 test cases should not score 0.0 simply because one edge case was missed — that conflates "wrong direction" with "nearly right." The threshold requires both directional correctness (touched the right files) and substantive correctness (at least half the tests pass).
+
+### 8.5 Run Variance & Sampling Policy
+ 
+LLM sampling is stochastic. The same task, run twice on the same model, can
+pass once and fail once. §7 already asserts that this variance is not uniform
+across tiers — Tier 1 tasks are expected to have close to zero run-to-run
+variance, while Tier 4 tasks are expected to have high variance. NanoBench
+turns that assertion into an actual sampling policy, so the claim can be
+checked rather than taken on faith.
+ 
+**Runs per task.** The number of runs per task is set by its Architectural
+Complexity Tier, not applied uniformly:
+ 
+- **Tier 1–2:** 1 run per task per model. These tasks are expected to be
+  near-deterministic, so repeated sampling adds cost without adding signal.
+  Used directly in CI regression checks.
+- **Tier 3–4:** 5 runs per task per model, minimum, before any score from
+  these tasks is used in a regression comparison. This is a higher bar than
+  typical CI eval sampling, because NanoBench's Tier 3–4 tasks are more
+  expensive and more architecturally demanding per run — getting the sample
+  size right matters more here, not less.
+**Score reporting.** Every task reports two numbers, not one:
+ 
+- `pass@1` — the result of a single run. Cheap, useful as a smoke-test signal,
+  but not used alone for regression claims on Tier 3–4 tasks.
+- Averaged score over N runs — the number actually used for trend comparisons
+  and the Provider Matrix in §8's Benchmark Outputs.
+Both the raw pass count (e.g. "3/5 runs passed") and the derived score are
+shown in the output report, so a reader can see the sample size behind any
+number rather than a single smoothed percentage.
+ 
+**Temperature.** Temperature is pinned to 0 by default for every provider
+that supports it. The actual temperature used is recorded per run in the
+`--json` telemetry (see §8's Execution Pipeline). Where a provider or model
+does not support temperature 0 — some hosted reasoning models force sampling
+— the run is explicitly flagged as non-deterministic in the output, so a
+reviewer can tell whether spread in a Tier 3/4 result comes from the task's
+difficulty or from an unpinned sampling parameter.
+ 
+**What counts as a real regression.** A raw point-estimate comparison (for
+example, "52% dropped to 55%") is not enough to claim a regression at
+NanoBench's dataset size — a single flipped task can move the aggregate by a
+large margin on its own. Instead, each aggregate score is reported with a
+confidence interval computed from its N runs (a Wilson interval on the pass
+rate). Two scores are only treated as a real regression or improvement if
+their intervals do not overlap. If the intervals overlap, the report labels
+the movement as "not distinguishable from noise" instead of presenting it as
+a finding.
+ 
+---
 
 ### Benchmark Outputs
 
@@ -371,7 +421,7 @@ question in §14 for how this gets validated before it is trusted at scale.
  
 ---
 
-### 9.2 Signal Confidence Level(1-4)
+### 9.2 Signal Confidence Level (1-4)
  
 Not every diagnostic signal in this taxonomy carries the same certainty. Some
 come straight from structured fields with no interpretation required; others
@@ -429,7 +479,7 @@ The agent exhausted its context window or API token budget before outputting a v
 
 *Diagnostic signal: Nanocoder exits with a context-size error or rate-limit error before `test_command` is reached.*
 
-### Partial Fixes (`partial_fix_only`) Level 1 + Level 2
+### Partial Fixes (`partial_fix_only`) →  Level 1 + Level 2
 
 The agent successfully implemented correct logic for a subset of the task but failed to catch all required edge cases. This triggers fractional scoring (0.5) because the agent demonstrated strict directional and partial functional correctness.
 
@@ -525,6 +575,22 @@ configuration. Polyglot environments run inside fully containerized sandboxes, e
 
 **Mitigation:** NanoBench utilizes **Hinted Mode** as the default execution path. By injecting expert metadata, the framework prevents runaway API costs caused by unbounded file exploration, making it financially feasible to run continuous CI regressions. Maintainers can selectively trigger **Navigation Mode** for deep-dive pathfinding evaluations when token budgets permit.
 
+### Statistical Power at v1 Scale
+**Risk:** With a v1 dataset of roughly 6 tasks, each task carries a large
+share of the aggregate score. A single task flipping from pass to fail can
+move the overall number by a large margin — larger than many of the real
+regressions the benchmark is meant to catch. At this scale, it is genuinely
+hard to tell a real regression from ordinary run-to-run noise.
+ 
+**Mitigation:** This is a known and bounded limitation, not a hidden one. The
+sampling and confidence-interval policy in §8.5 is the short-term mitigation:
+wide confidence intervals at v1 scale will correctly show up as wide, and the
+report will say so rather than presenting a noisy point estimate as a
+finding. The long-term fix is dataset growth — §15's v2/v3 roadmap already
+plans to expand the task count, which is what actually narrows the intervals.
+v1's regression-detection claim should be read as directionally useful but
+statistically weak, with that weakness improving as the dataset grows.
+ 
 ### Benchmark Bias
 **Risk:** Tasks curated by one person reflect a narrow domain slice.
 
@@ -582,7 +648,7 @@ disputes? This is a collective-level decision, not a technical one.
 
 ### Version 1.0 Deliverables
 
-- Curated Diagnostic Dataset: A foundational matrix of 6 high-complexity, multi-file tasks spanning diverse, polyglot architectural environments, with all states strictly pinned and validated.
+- Curated Diagnostic Dataset: A foundational matrix of 6 high-complexity, multi-file tasks spanning diverse, polyglot architectural environments, with all states strictly pinned and validated. This 6-task set is a starting point for the sampling and confidence-interval methodology in §8.5, not a target ceiling — v2/v3 dataset growth (below) is the primary lever for narrowing confidence intervals and strengthening the regression-detection claim in §2.
 
 - Automated Orchestration Engine: A headless, fully automated evaluation pipeline that dynamically injects boundaries, triggers Nanocoder in non-interactive mode, and extracts fractional scores via native test suites.
 
