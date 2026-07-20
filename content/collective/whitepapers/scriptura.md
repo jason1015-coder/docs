@@ -81,7 +81,7 @@ This is the long picture from the collective's introduction page expressed as an
 
 A deliberately narrow v1, shipped well.
 
-- **An editor built on the open VS Code sources**, with the proprietary AI surfaces removed and Scriptura's AI layer in their place. No account required to launch.
+- **An editor built on the open scriptura sources**, 
 - **The provider abstraction with at least two adapters shipped:** a local Ollama/LM Studio adapter and an OpenAI-compatible adapter. Nanocoder wired in as the agent backend.
 - **The inline completion loop** against the local provider, with tab-to-accept and latency treated as a primary metric.
 - **The chat and inline-edit surfaces** with `@codebase` retrieval through the local context engine.
@@ -104,7 +104,8 @@ What v1 ships is "an open editor with the Cursor feel, a real provider contract,
 - **Fork Cursor directly.** Impossible: Cursor is closed source. Its value is in the proprietary layer we are precisely trying to replace. No fork path exists.
 - **Ship only as a VS Code extension, not a fork.** Already exists, but has less potential for expansion, integration, and customization.
 - **Fork VS Code.** Possible, but more performance overhead, which is not good for a machine already running a local LLM.
-
+- **Fork IntelliJ IDEA base**
+Even worst performance and even harder tech stack(java-based), even more restricted architecture for expansion , compare to VScode 
 
 ## Resolved in review
 
