@@ -4,7 +4,7 @@ description: "A working whitepaper for an open source, local-first AI code edito
 sidebar_order: 7
 proposer: "Jason-Chiu"
 proposer_github: "jason1015-coder"
-status: "In public review"
+status: "Paused"
 review_opens: "2026-07-15"
 review_closes: "2026-09-15"
 ---
